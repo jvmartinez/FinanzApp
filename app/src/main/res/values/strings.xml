@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name" translatable="false">Finanz App</string>
+    <string name="copy_title_button">Earnings</string>
+    <string name="copy_see_all">See All</string>
+    <string name="copy_title_transactions">Transactions</string>
+    <string name="copy_title_balance">Total Balance</string>
+    <string name="copy_my_wallet">My Wallet</string>
+</resources>

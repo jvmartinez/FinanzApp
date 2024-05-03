@@ -1,0 +1,7 @@
+<resources>
+    <string name="copy_title_button">Ganancias</string>
+    <string name="copy_see_all">See All</string>
+    <string name="copy_title_transactions">Transacciones</string>
+    <string name="copy_title_balance">Total Balance</string>
+    <string name="copy_my_wallet">Mi billetera</string>
+</resources>
