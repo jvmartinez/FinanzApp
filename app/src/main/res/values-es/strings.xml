@@ -4,4 +4,11 @@
     <string name="copy_title_transactions">Transacciones</string>
     <string name="copy_title_balance">Total Balance</string>
     <string name="copy_my_wallet">Mi billetera</string>
+    <string name="forgot_password">Has olvidado tu contraseña</string>
+    <string name="copy_title_continue">Continuar</string>
+    <string name="copy_or">o</string>
+    <string name="copy_login_with_google">Inicio de sesión con Google</string>
+    <string name="copy_field_password">Contraseña</string>
+    <string name="copy_field_email">Correo electrónico</string>
+    <string name="copy_title_login">Inicio de sesión</string>
 </resources>

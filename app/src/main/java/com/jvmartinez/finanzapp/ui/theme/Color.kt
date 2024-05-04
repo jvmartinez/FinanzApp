@@ -13,3 +13,5 @@ val Pink40 = Color(0xFF7D5260)
 val GrayLight = Color(0xFF489FCD)
 
 val HitGrey = Color(0xFFA4A5A5)
+val GrayDark = Color(0xFF75818F)
+val MissGrey = Color(0xFFE3E5E8)
