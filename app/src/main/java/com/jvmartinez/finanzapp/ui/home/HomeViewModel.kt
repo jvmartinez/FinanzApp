@@ -19,6 +19,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun getBalance() {
+        // TODO get balance from server
         balance = BalanceView(
             "$1000.00",
             transactions = listOf(

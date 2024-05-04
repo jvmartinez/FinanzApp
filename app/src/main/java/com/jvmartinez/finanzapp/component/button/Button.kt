@@ -51,7 +51,6 @@ fun ButtonTransparentBasic(
                 fontSize = TextSizes.Small,
                 color = textColor ?: GrayLight,
                 textAlign = textAlign ?: TextAlign.Center,
-                modifier = Modifier.weight(1f)
             )
         }
     }
