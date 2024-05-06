@@ -1,6 +1,5 @@
 package com.jvmartinez.finanzapp.component.text
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -27,6 +26,7 @@ fun textStyle(
     fontWeight = (if (isBold) FontWeight.SemiBold else FontWeight.Normal)
 )
 
+@Suppress("LongParameterList")
 @Composable
 fun TextCustom(
     title: String,

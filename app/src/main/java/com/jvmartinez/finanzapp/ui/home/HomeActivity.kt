@@ -26,8 +26,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.jvmartinez.finanzapp.R
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
@@ -38,10 +38,10 @@ import com.jvmartinez.finanzapp.ui.model.BalanceView
 import com.jvmartinez.finanzapp.ui.theme.Margins
 import com.jvmartinez.finanzapp.ui.theme.TextSizes
 
-
-@Preview
 @Composable
-fun ScreenHome(balanceView: BalanceView? = null) {
+fun ScreenHome(viewModel: HomeViewModel = hiltViewModel()) {
+    viewModel.onBalance()
+    val balanceView: BalanceView = viewModel.onBalance()
     Scaffold(
         topBar = { ViewToolbar() }
     ) { innerPadding ->
@@ -99,75 +99,88 @@ fun CardBalance(balance: String) {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            Box {
-                Image(
-                    contentScale = ContentScale.None,
-                    painter = painterResource(id = R.drawable.ic_group_colors),
-                    contentDescription = null,
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                LazyColumn {
-                    item {
-                        TextCustom(
-                            title = stringResource(id = R.string.copy_title_balance),
-                            textColor = Color.White
-                        )
-                    }
-                    item {
-                        TextCustom(
-                            title = balance,
-                            textColor = Color.White,
-                            textSize = TextSizes.Massive,
-                            isBold = true,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 4.dp)
-                        )
-                    }
-                }
+            CardItemIconTopEnd()
+            CardItemInformation(balance)
+        }
+        CardItemBalanceFooter()
+    }
+}
 
-            }
+@Composable
+fun CardItemBalanceFooter() {
+    Box(
+        contentAlignment = Alignment.BottomStart,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+        Box {
+            Image(
+                contentScale = ContentScale.None,
+                painter = painterResource(id = R.drawable.ic_semi_cicle),
+                contentDescription = null,
+            )
         }
         Box(
-            contentAlignment = Alignment.BottomStart,
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
+                .padding(16.dp)
         ) {
-            Box {
-                Image(
-                    contentScale = ContentScale.None,
-                    painter = painterResource(id = R.drawable.ic_semi_cicle),
-                    contentDescription = null,
+            Row {
+                TextCustom(
+                    title = stringResource(id = R.string.copy_my_wallet),
+                    textColor = Color.White,
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterVertically)
+                        .padding(end = Margins.Medium),
+                    textAlign = TextAlign.End
+                )
+                ImageBasic(
+                    resourceDrawable = R.drawable.ic_bg_white_arrow_next,
                 )
             }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Row {
-                    TextCustom(
-                        title = stringResource(id = R.string.copy_my_wallet),
-                        textColor = Color.White,
-                        modifier = Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                            .padding(end = Margins.Medium)
-                        ,
-                        textAlign = TextAlign.End
-                    )
-                    ImageBasic(
-                        resourceDrawable = R.drawable.ic_bg_white_arrow_next,
-                    )
-                }
+        }
+    }
+}
+
+@Composable
+fun CardItemInformation(balance: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        LazyColumn {
+            item {
+                TextCustom(
+                    title = stringResource(id = R.string.copy_title_balance),
+                    textColor = Color.White
+                )
+            }
+            item {
+                TextCustom(
+                    title = balance,
+                    textColor = Color.White,
+                    textSize = TextSizes.Massive,
+                    isBold = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                )
             }
         }
+    }
+}
+
+@Composable
+fun CardItemIconTopEnd() {
+    Box {
+        Image(
+            contentScale = ContentScale.None,
+            painter = painterResource(id = R.drawable.ic_group_colors),
+            contentDescription = null,
+        )
     }
 }
 
@@ -187,101 +200,97 @@ fun SubCardBalance(balanceView: BalanceView?) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            Box(
-                contentAlignment = Alignment.TopStart,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Box {
-                    ImageBasic(resourceDrawable = R.drawable.ic_semi_cicle_top)
+            SubCardItemIconTopStart()
+            SubCardItemInformation(balanceView)
+            SubCardItemIconBottomEnd()
+        }
+    }
+}
+
+@Composable
+fun SubCardItemIconBottomEnd() {
+    Box(
+        contentAlignment = Alignment.BottomEnd,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+        Box {
+            ImageBasic(resourceDrawable = R.drawable.ic_semi_cicle_2)
+        }
+    }
+}
+
+@Composable
+fun SubCardItemInformation(balanceView: BalanceView?) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Margins.Large),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            item { ImageBasic(R.drawable.ic_positive) }
+            item {
+                Column(modifier = Modifier.padding(horizontal = Margins.Large)) {
+                    TextCustom(title = "Income", textColor = Color.White)
+                    TextCustom(
+                        title = balanceView?.income.orEmpty(),
+                        textColor = Color.White,
+                        textSize = TextSizes.XMedium,
+                        isBold = true
+                    )
                 }
             }
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-            ) {
-                LazyRow(
+            item {
+                ImageBasic(
+                    resourceDrawable = R.drawable.ic_line,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(Margins.Large),
-                    verticalAlignment = Alignment
-                        .CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    item {
-                        ImageBasic(
-                            R.drawable.ic_positive
-                        )
-                    }
-                    item {
-                        Column(
-                            modifier = Modifier.padding(
-                                horizontal = Margins.Large
-                            )
-                        ) {
-                            TextCustom(
-                                title = "Income",
-                                textColor = Color.White,
-                            )
-                            TextCustom(
-                                title = balanceView?.income.orEmpty(),
-                                textColor = Color.White,
-                                textSize = TextSizes.XMedium,
-                                isBold = true
-                            )
-                        }
-                    }
-                    item {
-                        ImageBasic(
-                            resourceDrawable = R.drawable.ic_line,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    horizontal = Margins.Medium
-                                )
-                        )
-                    }
-                    item {
-                        ImageBasic(
-                            R.drawable.ic_negative,
-                            modifier = Modifier.padding(
-                                start = Margins.Large
-                            )
-                        )
-                    }
-                    item {
-                        Column(
-                            modifier = Modifier.padding(
-                                horizontal = Margins.Medium
-                            )
-                        ) {
-                            TextCustom(
-                                title = "Outcome",
-                                textColor = Color.White,
-                            )
-                            TextCustom(
-                                title = balanceView?.outcome.orEmpty(),
-                                textColor = Color.White,
-                                textSize = TextSizes.XMedium,
-                                isBold = true
-                            )
-                        }
-                    }
-                }
+                        .padding(horizontal = Margins.Medium)
+                )
             }
-            Box(
-                contentAlignment = Alignment.BottomEnd,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-            ) {
-                Box {
-                    ImageBasic(resourceDrawable = R.drawable.ic_semi_cicle_2)
+            item {
+                ImageBasic(
+                    R.drawable.ic_negative, modifier = Modifier.padding(
+                        start = Margins.Large
+                    )
+                )
+            }
+            item {
+                Column(
+                    modifier = Modifier.padding(
+                        horizontal = Margins.Medium
+                    )
+                ) {
+                    TextCustom(title = "Outcome", textColor = Color.White)
+                    TextCustom(
+                        title = balanceView?.outcome.orEmpty(),
+                        textColor = Color.White,
+                        textSize = TextSizes.XMedium,
+                        isBold = true
+                    )
                 }
             }
         }
     }
 }
 
+@Composable
+fun SubCardItemIconTopStart() {
+    Box(
+        contentAlignment = Alignment.TopStart,
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Box {
+            ImageBasic(resourceDrawable = R.drawable.ic_semi_cicle_top)
+        }
+    }
+}

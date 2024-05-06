@@ -17,6 +17,7 @@ import com.jvmartinez.finanzapp.ui.theme.Margins
 import com.jvmartinez.finanzapp.ui.theme.MissGrey
 import com.jvmartinez.finanzapp.ui.theme.TextSizes
 
+@Suppress("LongParameterList")
 @Composable
 fun TextFieldBasic(
     value: String,
@@ -55,5 +56,4 @@ fun TextFieldBasic(
                 cursorColor = GrayDark
             )
     )
-
 }

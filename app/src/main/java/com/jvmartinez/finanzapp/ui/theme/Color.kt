@@ -2,16 +2,14 @@ package com.jvmartinez.finanzapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
-val GrayLight = Color(0xFF489FCD)
-val AccentBlue = Color(0xFF0D3995)
-val HitGrey = Color(0xFFA4A5A5)
-val GrayDark = Color(0xFF75818F)
-val MissGrey = Color(0xFFE3E5E8)
+const val HEX_GRAY_LIGHT = 0xFFACACAC
+val GrayLight = Color(HEX_GRAY_LIGHT)
+const val HEX_ACCENT_BLUE = 0xFF0D3995
+val AccentBlue = Color(HEX_ACCENT_BLUE)
+const val HIT_GREY = 0xFFA4A5A5
+val HitGrey = Color(HIT_GREY)
+const val HEX_GRAY_DARK = 0xFF75818F
+val GrayDark = Color(HEX_GRAY_DARK)
+const val HEX_MISS_GREY = 0xFFE3E5E8
+val MissGrey = Color(HEX_MISS_GREY)
