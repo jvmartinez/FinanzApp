@@ -5,8 +5,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.jvmartinez.finanzapp.ui.login.ScreenLogin
-import com.jvmartinez.finanzapp.ui.signup.ScreenSignUp
+import com.jvmartinez.finanzapp.ui.home.ScreenHome
+import com.jvmartinez.finanzapp.ui.credential.ScreenLogin
+import com.jvmartinez.finanzapp.ui.credential.ScreenSignUp
+import com.jvmartinez.finanzapp.ui.splash.ScreenSplash
 
 @Composable
 fun NavGraph(
@@ -14,19 +16,51 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = RouterScreen.LoginScreen.route
+        startDestination = RouterScreen.SplashScreen.route
     ) {
         composable(
-            route = RouterScreen.LoginScreen.route
+            route = RouterScreen.SplashScreen.route
         ) {
-            ScreenLogin(navigateToSignUp = {
-                navController.navigate(RouterScreen.SignUpScreen.route)
-            })
+            ScreenSplash(
+                navigationToLogin = {
+                    navController.navigate(RouterScreen.SplashToLoginScreen.route)
+                },
+                navigationToHome = {
+                    navController.navigate(RouterScreen.SplashToHomeScreen.route)
+                }
+            )
         }
         composable(
-            route = RouterScreen.SignUpScreen.route
+            route = RouterScreen.SplashToHomeScreen.route
         ) {
-            ScreenSignUp(navigationBack = { navController.popBackStack() })
+            ScreenHome()
+        }
+
+        composable(
+            route = RouterScreen.SplashToLoginScreen.route
+        ) {
+            ScreenLogin(
+                navigateToSignUp = {
+                    navController.navigate(RouterScreen.LoginToSignUpScreen.route)
+                },
+                navigateToHome = {
+                    navController.navigate(RouterScreen.LoginToHomeScreen.route)
+                })
+        }
+        composable(
+            route = RouterScreen.LoginToSignUpScreen.route
+        ) {
+            ScreenSignUp(
+                navigationBack = { navController.popBackStack() },
+                navigateToHome = {
+                    navController.navigate(RouterScreen.LoginToHomeScreen.route)
+                }
+            )
+        }
+        composable(
+            route = RouterScreen.LoginToHomeScreen.route
+        ){
+            ScreenHome()
         }
     }
 }

@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.hilt)
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
+    alias(libs.plugins.detekt)
+
 }
 
 android {
@@ -67,6 +69,15 @@ dependencies {
     implementation(libs.androidx.navigation.navigation)
     implementation(libs.androidx.navigation.navigation.hilt)
     implementation(libs.airbnb.android.lottie)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.jackson)
+    implementation(libs.retrofit.coroutines)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.annotation)
+    implementation(libs.jackson.databind)
+    implementation(libs.androidx.datastore.core.android)
+    implementation(libs.androidx.datastore)
+    implementation(libs.ok.http.interceptor)
     kapt(libs.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

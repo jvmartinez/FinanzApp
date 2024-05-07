@@ -14,4 +14,5 @@
     <string name="copy_title_sign_up">Inscribirse</string>
     <string name="copy_terms_and_conditions">Al registrarte, aceptas nuestros términos y condiciones.</string>
     <string name="copy_label_sign_up">Registrarme</string>
+    <string name="copy_field_name">Nombre</string>
 </resources>
