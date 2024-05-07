@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.androidx.datastore.core.android)
     implementation(libs.androidx.datastore)
     implementation(libs.ok.http.interceptor)
+    implementation(libs.android.dotenv)
     kapt(libs.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

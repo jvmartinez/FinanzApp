@@ -1,11 +1,7 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
+/.idea/*
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
@@ -15,3 +11,12 @@
 local.properties
 /.idea/kotlinc.xml
 ./app//release/app-release.aab
+.env
+
+# Proguard
+proguard/
+proguard-rules.pro
+
+# Others
+/.DS_Store
+Thumbs.db
