@@ -34,9 +34,19 @@ class CredentialViewModel @Inject constructor(
 
     private val loadingData = MutableLiveData<StatusData<Boolean>>(StatusData.Empty)
 
+    private val isValidPassword = MutableLiveData(true)
+
+    private val isValidEmail = MutableLiveData(true)
+
+    private val isValidName = MutableLiveData(true)
+
     fun onChanceTextFieldLogin(email: String, password: String) {
         this.email.value = email
         this.password.value = password
+        isValidEmail.value = isValidEmail()
+        if (password.length > 1) {
+            isValidPassword.value = isValidPassword() && this.password.value.orEmpty().length > 1
+        }
         validToggleButton()
     }
 
@@ -44,11 +54,16 @@ class CredentialViewModel @Inject constructor(
         this.name.value = name
         this.email.value = email
         this.password.value = password
+        isValidEmail.value = isValidEmail()
+        isValidName.value = isValidName()
+        if (password.length > 1) {
+            isValidPassword.value = isValidPassword() && this.password.value.orEmpty().length > 1
+        }
         validToggleButtonSignUp()
     }
 
     private fun validToggleButton() {
-        toggleButton.postValue(isValidEmail() && isValidPassword())
+        toggleButton.value = isValidEmail() && isValidPassword()
     }
 
     private fun validToggleButtonSignUp() {
@@ -61,8 +76,11 @@ class CredentialViewModel @Inject constructor(
     private fun isValidEmail(): Boolean =
         Patterns.EMAIL_ADDRESS.matcher(email.value.orEmpty()).matches()
 
-    private fun isValidPassword(): Boolean =
-        (password.value.orEmpty().length) >= MAXIMUM_PASSWORD_LENGTH
+    private fun isValidPassword(): Boolean {
+        val regexPattern =
+            "(?=.*[!@#\$%^&*(),.?\":{}|<>])[A-Z][a-zA-Z0-9!@#\$%^&*(),.?\":{}|<>]{5,}".toRegex()
+        return password.value.orEmpty().matches(regexPattern)
+    }
 
     fun onLogin() {
         viewModelScope.launch {
@@ -92,6 +110,7 @@ class CredentialViewModel @Inject constructor(
         }
     }
 
+
     fun onClearField() {
         email.value = ""
         password.value = ""
@@ -111,4 +130,9 @@ class CredentialViewModel @Inject constructor(
     fun onDismissDialog() {
         loadingData.value = StatusData.Empty
     }
+
+    fun onValidPassword(): LiveData<Boolean> = isValidPassword
+    fun onValidEmail(): LiveData<Boolean> = isValidEmail
+
+    fun onValidName(): LiveData<Boolean> = isValidName
 }

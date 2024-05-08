@@ -27,4 +27,7 @@
     <string name="copy_title_income_outcome">Record your income and expenses</string>
     <string name="copy_title_button_here">Here!</string>
     <string name="copy_title_dialog_error">Error</string>
+    <string name="copy_message_alert_password">Please ensure the password meets the following criteria: Starts with an uppercase letter.Contains at least one special character, Has a minimum length of 6 characters.</string>
+    <string name="copy_message_alert_email">The email must be in a valid format</string>
+    <string name="copy_message_alert_name">The name cannot be empty</string>
 </resources>

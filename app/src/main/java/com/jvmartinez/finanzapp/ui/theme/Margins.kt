@@ -14,6 +14,8 @@ object Margins {
     val Huge = 32.dp
     val ExtraHuge = 42.dp
 
+    val WidthMicro = 60.dp
+    val WidthXMicro = 80.dp
     val WidthSmall = 120.dp
     val WidthXSmall = 150.dp
     val WidthMedium = 300.dp

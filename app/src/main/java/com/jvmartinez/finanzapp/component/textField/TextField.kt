@@ -46,6 +46,7 @@ fun TextFieldBasic(
         modifier = modifier,
         textStyle = TextStyle(color = Color.Black),
         shape = RoundedCornerShape(Margins.Medium),
+        maxLines = 1,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         colors = textCustom ?: TextFieldDefaults.colors(
                 unfocusedContainerColor = Color.White,

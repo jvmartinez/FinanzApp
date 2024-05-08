@@ -24,4 +24,7 @@
     <string name="copy_title_income_outcome">Registra tus ingresos y gastos</string>
     <string name="copy_title_button_here">Aquí!</string>
     <string name="copy_title_dialog_error">Error</string>
+    <string name="copy_message_alert_password">Por favor, asegúrate de que la contraseña cumpla con los siguientes criterios: Empieza con una letra mayúscula. Incluye al menos un carácter especial. Tiene una longitud mínima de 6 caracteres.</string>
+    <string name="copy_message_alert_email">El correo debe tener un formato válido</string>El nombre no puede ser vacío
+    <string name="copy_message_alert_name">El nombre no puede ser vacío</string>
 </resources>

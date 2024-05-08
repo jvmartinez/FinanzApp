@@ -13,3 +13,10 @@ const val HEX_GRAY_DARK = 0xFF75818F
 val GrayDark = Color(HEX_GRAY_DARK)
 const val HEX_MISS_GREY = 0xFFE3E5E8
 val MissGrey = Color(HEX_MISS_GREY)
+const val HEX_RED_LIGHT = 0xFFE74C3C
+val RedLight = Color(HEX_RED_LIGHT)
+const val HEX_RED_LIGHT_ALPHA = 0xCDF36C5E
+val RedLightWithAlpha = Color(HEX_RED_LIGHT_ALPHA)
+const val HEX_YELLOW_LIGHT = 0xFFF1C40F
+val YellowLight = Color(0xFFFFC107)
+

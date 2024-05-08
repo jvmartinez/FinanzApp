@@ -1,6 +1,7 @@
 package com.jvmartinez.finanzapp.ui.credential
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,10 +33,12 @@ import com.jvmartinez.finanzapp.component.text.TextCustom
 import com.jvmartinez.finanzapp.component.textField.TextFieldBasic
 import com.jvmartinez.finanzapp.ui.base.CustomDialogBase
 import com.jvmartinez.finanzapp.ui.base.DialogWithOneAction
+import com.jvmartinez.finanzapp.ui.base.DialogWithoutAction
 import com.jvmartinez.finanzapp.ui.base.StatusData
 import com.jvmartinez.finanzapp.ui.base.ViewToolbar
 import com.jvmartinez.finanzapp.ui.theme.AccentBlue
 import com.jvmartinez.finanzapp.ui.theme.FinanzAppTheme
+import com.jvmartinez.finanzapp.ui.theme.GrayLight
 import com.jvmartinez.finanzapp.ui.theme.Margins
 import com.jvmartinez.finanzapp.ui.theme.TextSizes
 
@@ -99,50 +102,76 @@ fun ContentSignUp(innerPadding: PaddingValues, viewModel: CredentialViewModel) {
     val password by viewModel.onPassword().observeAsState(initial = "")
     val name by viewModel.onName().observeAsState(initial = "")
     val toggleButton: Boolean by viewModel.onToggleButton().observeAsState(initial = false)
-    LazyColumn(modifier = Modifier.padding(innerPadding)) {
-        item {
-            ItemLogoSignUp()
-        }
-        item {
-            ItemTitleSignUp()
-        }
-        item {
-            ItemTextFieldName(
-                name = name,
-                onChangeName = {
-                    viewModel.onChanceTextFieldSignUp(
-                        it,
-                        email,
-                        password
-                    )
-                })
-            ItemTextFieldEmail(
-                email = email,
-                onChangeEmail = {
-                    viewModel.onChanceTextFieldSignUp(
-                        name,
-                        it,
-                        password
-                    )
-                })
-            ItemTextFieldPassword(
-                password = password,
-                onChangePassword = {
-                    viewModel.onChanceTextFieldSignUp(
-                        name,
-                        email,
-                        it
-                    )
-                })
-        }
-        item {
-            ItemTermsAndConditions()
-        }
-        item {
-            ItemButtonSignUp(
-                action = { viewModel.onSignUp() },
-                isEnabled = toggleButton
+    val onValidPassword: Boolean by viewModel.onValidPassword().observeAsState(initial = false)
+    val onValidEmail: Boolean by viewModel.onValidEmail().observeAsState(initial = false)
+    val onValidName: Boolean by viewModel.onValidName().observeAsState(initial = false)
+
+    Column {
+        if (onValidPassword.not()) {
+            DialogWithoutAction(
+                R.string.copy_message_alert_password,
+                colorBackground = GrayLight,
             )
+        }
+        if (onValidEmail.not()) {
+            DialogWithoutAction(
+                R.string.copy_message_alert_email,
+                colorBackground = GrayLight,
+                colorText = Color.White,
+            )
+        }
+        if (onValidName.not()) {
+            DialogWithoutAction(
+                R.string.copy_message_alert_name,
+                colorBackground = GrayLight,
+                colorText = Color.White,
+            )
+        }
+        LazyColumn(modifier = Modifier.padding(innerPadding)) {
+            item {
+                ItemLogoSignUp()
+            }
+            item {
+                ItemTitleSignUp()
+            }
+            item {
+                ItemTextFieldName(
+                    name = name,
+                    onChangeName = {
+                        viewModel.onChanceTextFieldSignUp(
+                            it,
+                            email,
+                            password
+                        )
+                    })
+                ItemTextFieldEmail(
+                    email = email,
+                    onChangeEmail = {
+                        viewModel.onChanceTextFieldSignUp(
+                            name,
+                            it,
+                            password
+                        )
+                    })
+                ItemTextFieldPassword(
+                    password = password,
+                    onChangePassword = {
+                        viewModel.onChanceTextFieldSignUp(
+                            name,
+                            email,
+                            it
+                        )
+                    })
+            }
+            item {
+                ItemTermsAndConditions()
+            }
+            item {
+                ItemButtonSignUp(
+                    action = { viewModel.onSignUp() },
+                    isEnabled = toggleButton
+                )
+            }
         }
     }
 }
