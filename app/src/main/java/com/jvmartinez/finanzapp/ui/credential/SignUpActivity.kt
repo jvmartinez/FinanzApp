@@ -1,6 +1,7 @@
 package com.jvmartinez.finanzapp.ui.credential
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +30,8 @@ import com.jvmartinez.finanzapp.component.button.ButtonBlackWithLetterWhite
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
 import com.jvmartinez.finanzapp.component.textField.TextFieldBasic
+import com.jvmartinez.finanzapp.ui.base.CustomDialogBase
+import com.jvmartinez.finanzapp.ui.base.DialogWithOneAction
 import com.jvmartinez.finanzapp.ui.base.StatusData
 import com.jvmartinez.finanzapp.ui.base.ViewToolbar
 import com.jvmartinez.finanzapp.ui.theme.AccentBlue
@@ -36,17 +39,12 @@ import com.jvmartinez.finanzapp.ui.theme.FinanzAppTheme
 import com.jvmartinez.finanzapp.ui.theme.Margins
 import com.jvmartinez.finanzapp.ui.theme.TextSizes
 
-
 @Composable
 fun ScreenSignUp(
     navigationBack: () -> Boolean,
     navigateToHome: () -> Unit,
     viewModel: CredentialViewModel = hiltViewModel(),
 ) {
-    val email by viewModel.onEmail().observeAsState(initial = "")
-    val password by viewModel.onPassword().observeAsState(initial = "")
-    val name by viewModel.onName().observeAsState(initial = "")
-    val toggleButton: Boolean by viewModel.onToggleButton().observeAsState(initial = false)
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animate))
     val onLoading by viewModel.onLoadingData().observeAsState(initial = StatusData.Empty)
 
@@ -67,56 +65,21 @@ fun ScreenSignUp(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
         when (onLoading) {
-            StatusData.Empty -> {
-                LazyColumn(modifier = Modifier.padding(innerPadding)) {
-                    item {
-                        ItemLogoSignUp()
+            StatusData.Empty -> ContentSignUp(innerPadding, viewModel)
+
+            is StatusData.Error -> {
+                CustomDialogBase(
+                    showDialog = true,
+                    onDismissClick = { viewModel.onDismissDialog() },
+                    content = {
+                        DialogWithOneAction(
+                            R.string.copy_title_dialog_sign_up,
+                            R.string.copy_message_dialog_generic,
+                        ) { viewModel.onDismissDialog() }
                     }
-                    item {
-                        ItemTitleSignUp()
-                    }
-                    item {
-                        ItemTextFieldName(
-                            name = name,
-                            onChangeName = {
-                                viewModel.onChanceTextFieldSignUp(
-                                    it,
-                                    email,
-                                    password
-                                )
-                            })
-                        ItemTextFieldEmail(
-                            email = email,
-                            onChangeEmail = {
-                                viewModel.onChanceTextFieldSignUp(
-                                    name,
-                                    it,
-                                    password
-                                )
-                            })
-                        ItemTextFieldPassword(
-                            password = password,
-                            onChangePassword = {
-                                viewModel.onChanceTextFieldSignUp(
-                                    name,
-                                    email,
-                                    it
-                                )
-                            })
-                    }
-                    item {
-                        ItemTermsAndConditions()
-                    }
-                    item {
-                        ItemButtonSignUp(
-                            action = { viewModel.onSignUp() },
-                            isEnabled = toggleButton
-                        )
-                    }
-                }
+                )
             }
 
-            is StatusData.Error -> {}
             StatusData.Loading -> {
                 LottieAnimation(
                     composition = composition,
@@ -126,6 +89,60 @@ fun ScreenSignUp(
             }
 
             is StatusData.Success -> navigateToHome()
+        }
+    }
+}
+
+@Composable
+fun ContentSignUp(innerPadding: PaddingValues, viewModel: CredentialViewModel) {
+    val email by viewModel.onEmail().observeAsState(initial = "")
+    val password by viewModel.onPassword().observeAsState(initial = "")
+    val name by viewModel.onName().observeAsState(initial = "")
+    val toggleButton: Boolean by viewModel.onToggleButton().observeAsState(initial = false)
+    LazyColumn(modifier = Modifier.padding(innerPadding)) {
+        item {
+            ItemLogoSignUp()
+        }
+        item {
+            ItemTitleSignUp()
+        }
+        item {
+            ItemTextFieldName(
+                name = name,
+                onChangeName = {
+                    viewModel.onChanceTextFieldSignUp(
+                        it,
+                        email,
+                        password
+                    )
+                })
+            ItemTextFieldEmail(
+                email = email,
+                onChangeEmail = {
+                    viewModel.onChanceTextFieldSignUp(
+                        name,
+                        it,
+                        password
+                    )
+                })
+            ItemTextFieldPassword(
+                password = password,
+                onChangePassword = {
+                    viewModel.onChanceTextFieldSignUp(
+                        name,
+                        email,
+                        it
+                    )
+                })
+        }
+        item {
+            ItemTermsAndConditions()
+        }
+        item {
+            ItemButtonSignUp(
+                action = { viewModel.onSignUp() },
+                isEnabled = toggleButton
+            )
         }
     }
 }
@@ -145,6 +162,7 @@ fun ItemButtonSignUp(action: () -> Unit = {}, isEnabled: Boolean) {
 
 @Composable
 fun ItemTermsAndConditions() {
+
     TextCustom(
         title = stringResource(id = R.string.copy_terms_and_conditions),
         modifier = Modifier

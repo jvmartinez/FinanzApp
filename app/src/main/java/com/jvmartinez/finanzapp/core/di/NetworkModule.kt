@@ -1,5 +1,6 @@
 package com.jvmartinez.finanzapp.core.di
 
+import com.jvmartinez.finanzapp.BuildConfig
 import com.jvmartinez.finanzapp.core.api.AuthInterceptor
 import com.jvmartinez.finanzapp.core.repository.local.perferences.PreferencesRepository
 import com.jvmartinez.finanzapp.core.repository.remote.balance.BalanceService
@@ -20,8 +21,7 @@ object NetworkModule {
 
     @Suppress("FunctionOnlyReturningConstant")
     @Provides
-    fun provideBaseUrl() = "http://192.168.1.249:8082"
-
+    fun provideBaseUrl() = BuildConfig.BASE_URL
 
     @Provides
     fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {

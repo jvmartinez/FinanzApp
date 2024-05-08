@@ -1,10 +1,11 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.hilt)
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
     alias(libs.plugins.detekt)
-
 }
 
 android {
@@ -25,12 +26,20 @@ android {
     }
 
     buildTypes {
+        val config = rootProject.file("env.properties").inputStream().use {
+            Properties().apply { load(it) }
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "BASE_URL", config.getProperty("API_PROD"))
+        }
+        debug {
+            applicationIdSuffix = ".debug"
+            buildConfigField("String", "BASE_URL", config.getProperty("API_DEV"))
         }
     }
     compileOptions {
@@ -42,6 +51,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.13"
@@ -78,7 +88,6 @@ dependencies {
     implementation(libs.androidx.datastore.core.android)
     implementation(libs.androidx.datastore)
     implementation(libs.ok.http.interceptor)
-    implementation(libs.android.dotenv)
     kapt(libs.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

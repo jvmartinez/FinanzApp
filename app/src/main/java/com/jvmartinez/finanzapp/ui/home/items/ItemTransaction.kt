@@ -40,5 +40,5 @@ fun ItemTransaction(transactionView: TransactionView) {
 @Preview
 @Composable
 fun ItemTransactionPreview() {
-    ItemTransaction(TransactionView("Description", "Amount", "Date"))
+    ItemTransaction(TransactionView(0.0, "Amount", "Date"))
 }

@@ -19,6 +19,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,11 +28,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.jvmartinez.finanzapp.R
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
+import com.jvmartinez.finanzapp.ui.base.CustomDialogBase
+import com.jvmartinez.finanzapp.ui.base.DialogWithOneAction
+import com.jvmartinez.finanzapp.ui.base.StatusData
 import com.jvmartinez.finanzapp.ui.base.ViewToolbar
 import com.jvmartinez.finanzapp.ui.home.items.ItemTitleWithButton
 import com.jvmartinez.finanzapp.ui.home.items.ItemTransaction
@@ -40,14 +49,33 @@ import com.jvmartinez.finanzapp.ui.theme.TextSizes
 
 @Composable
 fun ScreenHome(viewModel: HomeViewModel = hiltViewModel()) {
-    viewModel.onBalance()
-    val balanceView: BalanceView = viewModel.onBalance()
+    viewModel.getBalance()
+    val onBalanceView by viewModel.onLoadingData().observeAsState(initial = StatusData.Empty)
     Scaffold(
         topBar = { ViewToolbar() }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            CardBalance(balanceView?.balance.orEmpty())
-            ScrollContent(balanceView)
+        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animate))
+        when (onBalanceView) {
+            is StatusData.Error -> CustomDialogBase(
+                showDialog = true,
+                onDismissClick = { viewModel.onDismissDialog() },
+                content = { DialogWithOneAction(
+                    R.string.copy_title_dialog_error,
+                    R.string.copy_message_dialog_generic,
+                ) { viewModel.onDismissDialog() } }
+            )
+            StatusData.Empty, StatusData.Loading -> LottieAnimation(
+                composition = composition,
+                iterations = Int.MAX_VALUE,
+                modifier = Modifier.fillMaxSize()
+            )
+            is StatusData.Success -> {
+                val balanceView = (onBalanceView as StatusData.Success).data
+                Column(modifier = Modifier.padding(innerPadding)) {
+                    CardBalance(balanceView.balance.orEmpty())
+                    ScrollContent(balanceView)
+                }
+            }
         }
     }
 }
@@ -64,8 +92,8 @@ fun ScrollContent(balanceView: BalanceView?) {
         }
         item {
             ItemTitleWithButton(
-                stringResource(id = R.string.copy_title_button),
-                stringResource(id = R.string.copy_see_all)
+                stringResource(id = R.string.copy_title_income_outcome),
+                stringResource(id = R.string.copy_title_button_here)
             )
         }
         item {
@@ -291,6 +319,20 @@ fun SubCardItemIconTopStart() {
     ) {
         Box {
             ImageBasic(resourceDrawable = R.drawable.ic_semi_cicle_top)
+        }
+    }
+}
+
+
+@Preview
+@Composable
+fun PreviewHome() {
+    Scaffold(
+        topBar = { ViewToolbar() }
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            CardBalance("$1.000.000")
+            ScrollContent(null)
         }
     }
 }

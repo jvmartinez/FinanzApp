@@ -12,7 +12,16 @@
     <string name="copy_field_email">Correo electrónico</string>
     <string name="copy_title_login">Inicio de sesión</string>
     <string name="copy_title_sign_up">Inscribirse</string>
-    <string name="copy_terms_and_conditions">Al registrarte, aceptas nuestros términos y condiciones.</string>
+    <string name="copy_terms_and_conditions">Al registrarte, aceptas nuestros Términos y Condiciones.</string>
     <string name="copy_label_sign_up">Registrarme</string>
     <string name="copy_field_name">Nombre</string>
+    <string name="title_button_cancel">Cancel</string>
+    <string name="title_button_accept">Accept</string>
+    <string name="copy_title_dialog_login">Error de inicio de sesión</string>
+    <string name="copy_message_dialog_login">Correo electrónico y/o contraseña incorrectos. Por favor, inténtalo de nuevo.</string>
+    <string name="copy_title_dialog_sign_up">Error al Registrarse</string>
+    <string name="copy_message_dialog_generic">¡Ups! Algo salió mal. Por favor, inténtalo de nuevo más tarde.</string>
+    <string name="copy_title_income_outcome">Registra tus ingresos y gastos</string>
+    <string name="copy_title_button_here">Aquí!</string>
+    <string name="copy_title_dialog_error">Error</string>
 </resources>

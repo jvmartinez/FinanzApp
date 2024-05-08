@@ -30,6 +30,8 @@ import com.jvmartinez.finanzapp.component.button.ButtonTransparentBasic
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
 import com.jvmartinez.finanzapp.component.textField.TextFieldBasic
+import com.jvmartinez.finanzapp.ui.base.CustomDialogBase
+import com.jvmartinez.finanzapp.ui.base.DialogWithOneAction
 import com.jvmartinez.finanzapp.ui.base.StatusData
 import com.jvmartinez.finanzapp.ui.theme.AccentBlue
 import com.jvmartinez.finanzapp.ui.theme.Margins
@@ -48,7 +50,14 @@ fun ScreenLogin(
             StatusData.Empty -> {
                 ContentLogin(innerPadding, navigateToSignUp, viewModel)
             }
-            is StatusData.Error -> {}
+            is StatusData.Error -> CustomDialogBase(
+                showDialog = true,
+                onDismissClick = { viewModel.onDismissDialog() },
+                content = { DialogWithOneAction(
+                    R.string.copy_title_dialog_login,
+                    R.string.copy_message_dialog_login,
+                ) { viewModel.onDismissDialog() } }
+            )
             StatusData.Loading -> {
                 LottieAnimation(
                     composition = composition,

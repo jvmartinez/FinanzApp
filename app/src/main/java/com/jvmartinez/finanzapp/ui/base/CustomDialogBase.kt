@@ -1,0 +1,161 @@
+package com.jvmartinez.finanzapp.ui.base
+
+import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.jvmartinez.finanzapp.R
+import com.jvmartinez.finanzapp.component.image.ImageBasic
+import com.jvmartinez.finanzapp.component.text.TextCustom
+import com.jvmartinez.finanzapp.ui.theme.GrayDark
+import com.jvmartinez.finanzapp.ui.theme.HitGray
+import com.jvmartinez.finanzapp.ui.theme.Margins
+
+
+@Composable
+fun CustomDialogBase(
+    showDialog: Boolean,
+    onDismissClick: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    if (showDialog) {
+        Dialog(
+            onDismissRequest = { onDismissClick() },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false
+            )
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .pointerInput(Unit) {
+                            detectTapGestures { }
+                        }
+                        .shadow(
+                            Margins.Medium,
+                            shape = RoundedCornerShape(Margins.Large)
+                        )
+                        .width(Margins.WidthMedium)
+                        .clip(RoundedCornerShape(Margins.Large))
+                        .background(
+                            color = HitGray
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    content()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DialogWithOneAction(
+    @StringRes titleDialog: Int,
+    @StringRes messageAlert: Int,
+    onDismissClick: () -> Unit,
+) {
+    Column(Modifier.background(MaterialTheme.colorScheme.surface)) {
+        var graphicVisible by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) { graphicVisible = true }
+
+        AnimatedVisibility(
+            visible = graphicVisible,
+            enter = expandVertically(
+                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                expandFrom = Alignment.CenterVertically,
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Margins.WidthXSmall)
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                HitGray,
+                                GrayDark,
+                            )
+                        )
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                ImageBasic(resourceDrawable = R.drawable.ic_header_search)
+            }
+        }
+
+        Column(
+            modifier = Modifier.padding(Margins.Large)
+        ) {
+            Box(modifier = Modifier.height(Margins.Medium))
+            TextCustom(title = stringResource(id = titleDialog), isBold = true)
+            Box(modifier = Modifier.height(Margins.Medium))
+            TextCustom(title = stringResource(id = messageAlert))
+        }
+        Row(
+            modifier = Modifier.height(IntrinsicSize.Min)
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(Margins.Medium)
+                    .clip(RoundedCornerShape(Margins.Medium))
+                    .clickable { onDismissClick() }
+                    .weight(1f)
+                    .padding(vertical = Margins.XLarge),
+                contentAlignment = Alignment.Center
+            ) {
+                TextCustom(title = stringResource(id = R.string.title_button_accept))
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewResetWarning() {
+    CustomDialogBase(
+        showDialog = true,
+        onDismissClick = {},
+        content = {
+            DialogWithOneAction(
+                messageAlert = R.string.copy_message_dialog_login,
+                titleDialog = R.string.copy_title_dialog_login,
+                onDismissClick = {}
+            )
+        }
+    )
+}

@@ -15,7 +15,16 @@
     <string name="copy_title_login">Login</string>
     <string name="title_activity_sign_up" translatable="false">SignUpActivity</string>
     <string name="copy_title_sign_up">SignUp</string>
-    <string name="copy_terms_and_conditions">By signing up, you’ve agree to our terms and conditions.</string>
+    <string name="copy_terms_and_conditions">By signing up, you’ve agree to our Terms and Conditions.</string>
     <string name="copy_label_sign_up">Sign Up\n</string>
     <string name="copy_field_name">Name</string>
+    <string name="title_button_cancel">Cancel</string>
+    <string name="title_button_accept">Accept</string>
+    <string name="copy_title_dialog_login">Login error</string>
+    <string name="copy_message_dialog_login">Incorrect email and/or password. Please try again.</string>
+    <string name="copy_title_dialog_sign_up">Error Sign up</string>
+    <string name="copy_message_dialog_generic">Oops! Something went wrong. Please try again later.</string>
+    <string name="copy_title_income_outcome">Record your income and expenses</string>
+    <string name="copy_title_button_here">Here!</string>
+    <string name="copy_title_dialog_error">Error</string>
 </resources>

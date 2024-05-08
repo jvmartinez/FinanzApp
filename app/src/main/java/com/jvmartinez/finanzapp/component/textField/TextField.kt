@@ -12,7 +12,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.jvmartinez.finanzapp.component.text.TextCustom
 import com.jvmartinez.finanzapp.ui.theme.GrayDark
-import com.jvmartinez.finanzapp.ui.theme.HitGrey
 import com.jvmartinez.finanzapp.ui.theme.Margins
 import com.jvmartinez.finanzapp.ui.theme.MissGrey
 import com.jvmartinez.finanzapp.ui.theme.TextSizes
@@ -45,7 +44,7 @@ fun TextFieldBasic(
             )
         },
         modifier = modifier,
-        textStyle = TextStyle(color = HitGrey),
+        textStyle = TextStyle(color = Color.Black),
         shape = RoundedCornerShape(Margins.Medium),
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         colors = textCustom ?: TextFieldDefaults.colors(

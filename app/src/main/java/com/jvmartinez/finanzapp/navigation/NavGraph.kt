@@ -1,13 +1,12 @@
 package com.jvmartinez.finanzapp.navigation
 
 import androidx.compose.runtime.Composable
-
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.jvmartinez.finanzapp.ui.home.ScreenHome
 import com.jvmartinez.finanzapp.ui.credential.ScreenLogin
 import com.jvmartinez.finanzapp.ui.credential.ScreenSignUp
+import com.jvmartinez.finanzapp.ui.home.ScreenHome
 import com.jvmartinez.finanzapp.ui.splash.ScreenSplash
 
 @Composable

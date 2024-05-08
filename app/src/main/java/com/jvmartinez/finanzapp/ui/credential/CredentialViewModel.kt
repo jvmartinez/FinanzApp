@@ -10,7 +10,6 @@ import com.jvmartinez.finanzapp.core.repository.local.perferences.IPreferencesRe
 import com.jvmartinez.finanzapp.core.repository.remote.login.ILoginRepository
 import com.jvmartinez.finanzapp.ui.base.StatusData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -106,5 +105,10 @@ class CredentialViewModel @Inject constructor(
     fun onPassword(): LiveData<String> = password
 
     fun onName(): LiveData<String> = name
+
     fun onLoadingData(): LiveData<StatusData<Boolean>> = loadingData
+
+    fun onDismissDialog() {
+        loadingData.value = StatusData.Empty
+    }
 }

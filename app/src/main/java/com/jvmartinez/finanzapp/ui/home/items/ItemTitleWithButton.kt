@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import com.jvmartinez.finanzapp.R
 import com.jvmartinez.finanzapp.component.button.ButtonTransparentBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
 import com.jvmartinez.finanzapp.ui.theme.Margins
@@ -34,4 +37,10 @@ fun ItemTitleWithButton(
         )
         ButtonTransparentBasic(title = textButton, action = action)
     }
+}
+
+@Preview
+@Composable
+fun ItemTitleWithButtonPreview() {
+    ItemTitleWithButton(title = stringResource(id = R.string.copy_title_income_outcome), textButton = "Button")
 }
