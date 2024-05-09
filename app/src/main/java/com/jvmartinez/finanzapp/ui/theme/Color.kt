@@ -17,6 +17,9 @@ const val HEX_RED_LIGHT = 0xFFE74C3C
 val RedLight = Color(HEX_RED_LIGHT)
 const val HEX_RED_LIGHT_ALPHA = 0xCDF36C5E
 val RedLightWithAlpha = Color(HEX_RED_LIGHT_ALPHA)
-const val HEX_YELLOW_LIGHT = 0xFFF1C40F
-val YellowLight = Color(0xFFFFC107)
+const val HEX_YELLOW_LIGHT = 0xFFFFCB66
+val YellowLight = Color(0xCCFFCB66)
+
+const val HEX_BRAND_BLUE = 0xFF377CC8
+val BrandBlue = Color(HEX_BRAND_BLUE)
 

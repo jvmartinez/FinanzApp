@@ -1,6 +1,5 @@
 package com.jvmartinez.finanzapp.ui.base
 
-import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -21,8 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,13 +43,9 @@ import com.jvmartinez.finanzapp.R
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
 import com.jvmartinez.finanzapp.ui.theme.GrayDark
-import com.jvmartinez.finanzapp.ui.theme.GrayLight
 import com.jvmartinez.finanzapp.ui.theme.HitGray
 import com.jvmartinez.finanzapp.ui.theme.Margins
 import com.jvmartinez.finanzapp.ui.theme.RedLight
-import com.jvmartinez.finanzapp.ui.theme.RedLightWithAlpha
-import com.jvmartinez.finanzapp.ui.theme.YellowLight
-
 
 @Composable
 fun CustomDialogBase(

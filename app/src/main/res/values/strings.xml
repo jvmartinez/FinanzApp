@@ -30,4 +30,6 @@
     <string name="copy_message_alert_password">Please ensure the password meets the following criteria: Starts with an uppercase letter.Contains at least one special character, Has a minimum length of 6 characters.</string>
     <string name="copy_message_alert_email">The email must be in a valid format</string>
     <string name="copy_message_alert_name">The name cannot be empty</string>
+    <string name="copy_field_date">Date</string>
+    <string name="copy_title_income_and_expenses">Income and expenses</string>
 </resources>
