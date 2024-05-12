@@ -48,11 +48,13 @@ import com.jvmartinez.finanzapp.ui.theme.TextSizes
 
 @Composable
 fun ScreenHome(
-    viewModel: HomeViewModel = hiltViewModel(),
     navigateToIncomeAndExpenses: () -> Unit = {}
 ) {
-    viewModel.getBalance()
+    val viewModel: HomeViewModel = hiltViewModel()
     val onBalanceView by viewModel.onLoadingData().observeAsState(initial = StatusData.Empty)
+    if (onBalanceView is StatusData.Empty) {
+        viewModel.getBalance()
+    }
     Scaffold(
         topBar = { ViewToolbar() }
     ) { innerPadding ->

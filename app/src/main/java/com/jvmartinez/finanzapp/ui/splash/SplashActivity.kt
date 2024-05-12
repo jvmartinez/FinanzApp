@@ -27,7 +27,7 @@ fun ScreenSplash(
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_lottie))
-        val isLoaded: StatusData<Boolean> by viewModel.onValidateLogin()
+        val isLoaded: StatusData<Boolean> by viewModel.onStatusData()
             .observeAsState(initial = StatusData.Loading)
         Column(
             modifier = Modifier

@@ -23,3 +23,5 @@ val YellowLight = Color(0xCCFFCB66)
 const val HEX_BRAND_BLUE = 0xFF377CC8
 val BrandBlue = Color(HEX_BRAND_BLUE)
 
+const val HEX_GREEN = 0xFF4CAF50
+val GREEN = Color(HEX_GREEN)

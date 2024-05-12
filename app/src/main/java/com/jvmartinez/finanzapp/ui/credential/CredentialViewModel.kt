@@ -88,6 +88,7 @@ class CredentialViewModel @Inject constructor(
             repository.signIn(email.value.orEmpty(), password.value.orEmpty()).catch {
                 loadingData.value = StatusData.Error(it.message.orEmpty())
             }.collect {
+                preferencesRepository.setUserKey(it.data.id.orEmpty())
                 preferencesRepository.setUserToken(it.data.token.orEmpty())
                 preferencesRepository.setUserName(it.data.name.orEmpty())
                 loadingData.value = StatusData.Success(it.code == OK_CODE)
@@ -103,6 +104,7 @@ class CredentialViewModel @Inject constructor(
             ).catch {
                 loadingData.value = StatusData.Error(it.message.orEmpty())
             }.collect {
+                preferencesRepository.setUserKey(it.data.id.orEmpty())
                 preferencesRepository.setUserName(it.data.name.orEmpty())
                 preferencesRepository.setUserToken(it.data.token.orEmpty())
                 loadingData.value = StatusData.Success(it.code == OK_CODE)

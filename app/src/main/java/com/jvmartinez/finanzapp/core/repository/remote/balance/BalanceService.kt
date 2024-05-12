@@ -2,6 +2,8 @@ package com.jvmartinez.finanzapp.core.repository.remote.balance
 
 import com.jvmartinez.finanzapp.core.api.ResponseBasic
 import com.jvmartinez.finanzapp.core.model.Balance
+import com.jvmartinez.finanzapp.core.model.Transaction
+import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -23,4 +25,10 @@ interface BalanceService {
 
     @DELETE("/balance/delete")
     suspend fun delete(id: String): ResponseBasic<Boolean>
+
+    @POST("/newTransaction/add")
+    suspend fun createTransaction(@Body transactions: List<Transaction>): ResponseBasic<List<Transaction>>
+
+    @GET("/transaction/findByUser")
+    suspend fun findByUserTransaction(): ResponseBasic<List<Transaction>>
 }

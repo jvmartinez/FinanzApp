@@ -42,6 +42,14 @@ class PreferencesRepository @Inject constructor(
         }
     }
 
+    override suspend fun setUserKey(name: String) {
+        Result.runCatching {
+            userDataStorePreferences.edit { preferences ->
+                preferences[KEY_USER_KEY] = name
+            }
+        }
+    }
+
     override suspend fun getUserToken(): Result<String> {
         return Result.runCatching {
             val flow = userDataStorePreferences.data
@@ -69,6 +77,25 @@ class PreferencesRepository @Inject constructor(
         }
     }
 
+    override suspend fun getUserKey(): Result<String>  {
+        return Result.runCatching {
+            val flow = userDataStorePreferences.data
+                .catch { exception ->
+
+                    if (exception is IOException) {
+                        emit(emptyPreferences())
+                    } else {
+                        throw exception
+                    }
+                }
+                .map { preferences ->
+                    preferences[KEY_USER_KEY]
+                }
+            val value = flow.firstOrNull() ?: ""
+            value
+        }
+    }
+
     private companion object {
 
         val KEY_USERNAME = stringPreferencesKey(
@@ -76,6 +103,9 @@ class PreferencesRepository @Inject constructor(
         )
         val KEY_USER_TOKEN = stringPreferencesKey(
             name = "USER_TOKEN"
+        )
+        val KEY_USER_KEY = stringPreferencesKey(
+            name = "USER_KEY"
         )
     }
 }

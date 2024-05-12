@@ -3,17 +3,20 @@ package com.jvmartinez.finanzapp.ui.income
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -42,6 +45,7 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -54,9 +58,13 @@ import com.jvmartinez.finanzapp.component.button.ButtonTransparentBasic
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
 import com.jvmartinez.finanzapp.component.textField.TextFieldBasic
+import com.jvmartinez.finanzapp.core.model.CategoryModel
 import com.jvmartinez.finanzapp.ui.base.ViewToolbar
+import com.jvmartinez.finanzapp.ui.theme.GrayDark
 import com.jvmartinez.finanzapp.ui.theme.GrayLight
 import com.jvmartinez.finanzapp.ui.theme.Margins
+import com.jvmartinez.finanzapp.ui.theme.RedLight
+import com.jvmartinez.finanzapp.utils.Utils
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview
@@ -83,45 +91,83 @@ fun IncomeAndOutComeScreen(
             modifier = Modifier
                 .padding(it)
                 .fillMaxWidth()
-                .fillMaxHeight()
         ) {
             FormIncomeAndOutComeScreen(viewModel)
-            Content()
+            Content(viewModel)
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Content() {
-    LazyVerticalGrid(
-        modifier = Modifier
-            .fillMaxSize(),
-        columns = GridCells.Fixed(3),
-    ) {
-        items(9) {
-            ItemIncomeScreen()
+fun Content(viewModel: IncomeAndOutComeViewModel = hiltViewModel()) {
+    val context = LocalContext.current
+    val categories by viewModel.getCategories().observeAsState(initial = listOf())
+    if (categories.isEmpty()) {
+        viewModel.setCategories(Utils.getListCategoryIncome(context))
+    }
+    Column {
+        LazyVerticalGrid(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = Margins.Medium),
+            columns = GridCells.Fixed(3),
+        ) {
+            items(categories) { categoryModel ->
+                ItemIncomeScreen(
+                    categoryModel
+                ) { category ->
+                    viewModel.setTpeTransaction(category)
+                }
+            }
         }
+        Spacer(modifier = Modifier.height(Margins.Micro).background(GrayDark))
+        ButtonBlackWithLetterWhite(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(horizontal = Margins.Large)
+                .padding(top = Margins.Large),
+            title = stringResource(id = R.string.title_button_save),
+            action = {
+                viewModel.save()
+            }
+        )
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormIncomeAndOutComeScreen(viewModel: IncomeAndOutComeViewModel) {
+fun FormIncomeAndOutComeScreen(viewModel: IncomeAndOutComeViewModel = hiltViewModel()) {
     val data by viewModel.onDate().observeAsState(initial = "")
+    val description by viewModel.getDescription().observeAsState(initial = "")
+    val amount by viewModel.getAmount().observeAsState(initial = 0.0)
+    val date by viewModel.onDate().observeAsState(initial = "")
+
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         TextFieldBasic(
             value = "",
-            onValueChange = { },
-            label = stringResource(id = R.string.copy_field_password),
-            placeholder = stringResource(id = R.string.copy_field_password),
+            onValueChange = { viewModel.onChangeSave(it, amount, date) },
+            label = stringResource(id = R.string.description),
+            placeholder = stringResource(id = R.string.description),
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White),
-            isPassword = true
+            isPassword = false
+        )
+
+        TextFieldBasic(
+            value = amount.toString(),
+            onValueChange = { viewModel.onChangeSave(description, it.toDouble(), date) },
+            label = stringResource(id = R.string.amount),
+            placeholder = stringResource(id = R.string.amount),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White),
+            isPassword = false
         )
 
         val state = rememberDatePickerState()
@@ -137,13 +183,13 @@ fun FormIncomeAndOutComeScreen(viewModel: IncomeAndOutComeViewModel) {
         Row {
             TextFieldBasic(
                 value = data,
-                onValueChange = { },
+                onValueChange = { viewModel.onChangeSave(description, amount, it) },
                 label = stringResource(id = R.string.copy_field_date),
                 placeholder = stringResource(id = R.string.copy_field_date),
                 modifier = Modifier
                     .weight(1f)
                     .background(Color.White),
-                isPassword = true
+                isPassword = false
             )
             Button(
                 onClick = { showDialog = true },
@@ -160,64 +206,71 @@ fun FormIncomeAndOutComeScreen(viewModel: IncomeAndOutComeViewModel) {
 }
 
 @Composable
-fun ItemIncomeScreen() {
-    Column(
-        modifier = Modifier.fillMaxWidth()
+fun ItemIncomeScreen(categoryModel: CategoryModel, selectCategory: (CategoryModel) -> Unit) {
+    Card(
+        modifier = Modifier
+            .width(150.dp)
+            .height(150.dp)
+            .padding(Margins.Small)
+            .clickable(onClick = { selectCategory(categoryModel) }),
+        colors = CardDefaults.cardColors(Transparent)
     ) {
-        Card(
-            modifier = Modifier
-                .width(150.dp)
-                .height(100.dp)
-                .padding(Margins.Small),
-            colors = CardDefaults.cardColors(Transparent)
+        Column(
+            Modifier
+                .fillMaxSize()
+                .paint(
+                    painterResource(id = R.drawable.ic_box),
+                    contentScale = ContentScale.FillBounds
+                )
         ) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .paint(
-                        painterResource(id = R.drawable.ic_box),
-                        contentScale = ContentScale.FillBounds
-                    )
+            Card(
+                modifier = Modifier
+                    .padding(Margins.XMedium)
+                    .align(Alignment.CenterHorizontally),
+                colors = CardDefaults.cardColors(Transparent)
+
+
             ) {
-                Card(
+                Box(
                     modifier = Modifier
-                        .padding(Margins.XMedium)
-                        .align(Alignment.CenterHorizontally),
-                    colors = CardDefaults.cardColors(Transparent)
-
-
+                        .padding(Margins.XSmall)
+                        .align(Alignment.CenterHorizontally)
                 ) {
-                    Box(
+
+                    ImageBasic(
+                        modifier = Modifier
+                            .padding(Margins.XSmall),
+                        resourceDrawable = R.drawable.frame_8753
+                    )
+                    ImageBasic(
                         modifier = Modifier
                             .padding(Margins.XSmall)
-                            .align(Alignment.CenterHorizontally)
-                    ) {
-
-                        ImageBasic(
-                            modifier = Modifier
-                                .padding(Margins.XSmall),
-                            resourceDrawable = R.drawable.frame_8753
-                        )
-                        ImageBasic(
-                            modifier = Modifier
-                                .padding(Margins.XSmall)
-                                .align(Alignment.Center),
-                            resourceDrawable = R.drawable.ic_twotone_restaurant_24
-                        )
-
-                    }
+                            .align(Alignment.Center),
+                        resourceDrawable = categoryModel.iconDrawable
+                    )
 
                 }
-                TextCustom(
-                    title = "Casa",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally)
-                )
+
             }
+            TextCustom(
+                title = categoryModel.name,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = Margins.Medium)
+                    .padding(bottom = Margins.XMicro)
+                    .align(Alignment.CenterHorizontally)
+            )
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Margins.Micro)
+                    .padding(horizontal = Margins.Large)
+                    .background(if (categoryModel.selected) RedLight else GrayDark)
+            )
         }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -233,11 +286,13 @@ fun ItemDatePicker(
         confirmButton = {
             ButtonBlackWithLetterWhite(
                 title = stringResource(id = R.string.title_button_accept),
-                action = { onDismiss() }
+                action = { onDismiss() },
+                isEnabled = true
             )
             ButtonTransparentBasic(
                 title = stringResource(id = R.string.title_button_cancel),
                 action = {
+                    state.selectedDateMillis = null
                     onDismiss()
                 }
             )
