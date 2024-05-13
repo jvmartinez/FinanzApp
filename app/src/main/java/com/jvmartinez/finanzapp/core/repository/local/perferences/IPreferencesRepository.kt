@@ -10,4 +10,7 @@ interface IPreferencesRepository {
 
     suspend fun setUserToken(name: String)
 
+    suspend fun getUserKey(): Result<String>
+
+    suspend fun setUserKey(name: String)
 }

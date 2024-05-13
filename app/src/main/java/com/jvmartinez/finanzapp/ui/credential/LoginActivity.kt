@@ -2,6 +2,7 @@ package com.jvmartinez.finanzapp.ui.credential
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -32,8 +32,10 @@ import com.jvmartinez.finanzapp.component.text.TextCustom
 import com.jvmartinez.finanzapp.component.textField.TextFieldBasic
 import com.jvmartinez.finanzapp.ui.base.CustomDialogBase
 import com.jvmartinez.finanzapp.ui.base.DialogWithOneAction
+import com.jvmartinez.finanzapp.ui.base.DialogWithoutAction
 import com.jvmartinez.finanzapp.ui.base.StatusData
 import com.jvmartinez.finanzapp.ui.theme.AccentBlue
+import com.jvmartinez.finanzapp.ui.theme.GrayLight
 import com.jvmartinez.finanzapp.ui.theme.Margins
 import com.jvmartinez.finanzapp.ui.theme.TextSizes
 
@@ -45,27 +47,50 @@ fun ScreenLogin(
 ) {
     val onLoading by viewModel.onLoadingData().observeAsState(initial = StatusData.Empty)
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animate))
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        when (onLoading) {
-            StatusData.Empty -> {
-                ContentLogin(innerPadding, navigateToSignUp, viewModel)
-            }
-            is StatusData.Error -> CustomDialogBase(
-                showDialog = true,
-                onDismissClick = { viewModel.onDismissDialog() },
-                content = { DialogWithOneAction(
-                    R.string.copy_title_dialog_login,
-                    R.string.copy_message_dialog_login,
-                ) { viewModel.onDismissDialog() } }
+    val onValidPassword: Boolean by viewModel.onValidPassword().observeAsState(initial = false)
+    val onValidEmail: Boolean by viewModel.onValidEmail().observeAsState(initial = false)
+
+    Column {
+        if (onValidPassword.not()) {
+            DialogWithoutAction(
+                R.string.copy_message_alert_password,
+                colorBackground = GrayLight,
             )
-            StatusData.Loading -> {
-                LottieAnimation(
-                    composition = composition,
-                    iterations = Int.MAX_VALUE,
-                    modifier = Modifier.fillMaxSize()
+        }
+        if (onValidEmail.not()) {
+            DialogWithoutAction(
+                R.string.copy_message_alert_email,
+                colorBackground = GrayLight,
+                colorText = Color.White,
+            )
+        }
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            when (onLoading) {
+                StatusData.Empty -> {
+                    ContentLogin(innerPadding, navigateToSignUp, viewModel)
+                }
+
+                is StatusData.Error -> CustomDialogBase(
+                    showDialog = true,
+                    onDismissClick = { viewModel.onDismissDialog() },
+                    content = {
+                        DialogWithOneAction(
+                            R.string.copy_title_dialog_login,
+                            R.string.copy_message_dialog_login,
+                        ) { viewModel.onDismissDialog() }
+                    }
                 )
+
+                StatusData.Loading -> {
+                    LottieAnimation(
+                        composition = composition,
+                        iterations = Int.MAX_VALUE,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                is StatusData.Success -> navigateToHome()
             }
-            is StatusData.Success -> navigateToHome()
         }
     }
 }
@@ -164,7 +189,9 @@ fun ItemSpacerOr() {
 }
 
 @Composable
-fun ItemButtonLogin(toggleButton: Boolean, onAction: () -> Unit = {}) {
+fun ItemButtonLogin(
+    toggleButton: Boolean, onAction: () -> Unit = {}
+) {
     ButtonBlackWithLetterWhite(
         title = stringResource(id = R.string.copy_title_continue),
         action = onAction,
@@ -263,11 +290,4 @@ fun ItemLogo() {
             .fillMaxWidth()
             .padding(top = Margins.Huge)
     )
-}
-
-
-@Preview
-@Composable
-fun PreviewLogin() {
-    ScreenLogin(navigateToSignUp = {}, navigateToHome = {})
 }

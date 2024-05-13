@@ -27,4 +27,30 @@
     <string name="copy_title_income_outcome">Record your income and expenses</string>
     <string name="copy_title_button_here">Here!</string>
     <string name="copy_title_dialog_error">Error</string>
+    <string name="copy_message_alert_password">Please ensure the password meets the following criteria: Starts with an uppercase letter.Contains at least one special character, Has a minimum length of 6 characters.</string>
+    <string name="copy_message_alert_email">The email must be in a valid format</string>
+    <string name="copy_message_alert_name">The name cannot be empty</string>
+    <string name="copy_field_date">Date</string>
+    <string name="copy_title_income_and_expenses">Income and expenses</string>
+
+    <!-- copy of category   -->
+    <string name="label_food">Food</string>
+    <string name="label_gift">Gift</string>
+    <string name="label_health">Health</string>
+    <string name="label_living_place">Living place</string>
+    <string name="label_transport">Transport</string>
+    <string name="label_personal_expenses">Personal\nexpenses</string>
+    <string name="label_pets">Pets</string>
+    <string name="label_supplies">Supplies</string>
+    <string name="label_trips">Trips</string>
+    <string name="label_debt">Debts</string>
+    <string name="label_others">Others</string>
+    <string name="label_saving">Saving</string>
+    <string name="label_salary">Salary</string>
+    <string name="label_bonuses">Bonuses</string>
+    <string name="label_extra">Extra</string>
+    <string name="label_accounts_collected">Accounts collected</string>
+    <string name="title_button_save">Save</string>
+    <string name="amount">Amount</string>
+    <string name="description">Description</string>
 </resources>

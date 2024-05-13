@@ -8,5 +8,6 @@ data class UserModel(
     @JsonProperty("name") val name: String? = null,
     @JsonProperty("email") val email: String? = null,
     @JsonProperty("password") val password: String? = null,
-    @JsonProperty("token") val token: String? = null
+    @JsonProperty("token") val token: String? = null,
+    @JsonProperty("id") val id: String? = null
 )

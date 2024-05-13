@@ -16,7 +16,7 @@ import javax.inject.Singleton
 
 
 val Context.userDataStore: DataStore<Preferences> by preferencesDataStore(
-    name = "com.jvmartinez.mycontrol_ei"
+    name = "com.jvmartinez.finanzapp"
 )
 
 @Module

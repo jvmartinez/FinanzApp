@@ -4,6 +4,8 @@ import androidx.compose.ui.unit.dp
 
 object Margins {
     val None = 0.dp
+    val Micro = 1.dp
+    val XMicro = 2.dp
     val Small = 4.dp
     val XSmall = 6.dp
     val Medium = 8.dp
@@ -14,7 +16,15 @@ object Margins {
     val Huge = 32.dp
     val ExtraHuge = 42.dp
 
+    val WidthMicro = 60.dp
+    val WidthXMicro = 80.dp
     val WidthSmall = 120.dp
     val WidthXSmall = 150.dp
     val WidthMedium = 300.dp
+
+    val HeightMicro = 60.dp
+    val HeightXMicro = 80.dp
+    val HeightSmall = 120.dp
+    val HeightXSmall = 150.dp
+    val HeightMedium = 300.dp
 }
