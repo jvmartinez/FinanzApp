@@ -1,5 +1,7 @@
 package com.jvmartinez.finanzapp.ui.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,16 +17,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -34,30 +41,35 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.jvmartinez.finanzapp.R
+import com.jvmartinez.finanzapp.component.button.BottomSheetCountries
+import com.jvmartinez.finanzapp.component.button.ButtonTransparentBasic
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
 import com.jvmartinez.finanzapp.ui.base.CustomDialogBase
 import com.jvmartinez.finanzapp.ui.base.DialogWithOneAction
 import com.jvmartinez.finanzapp.ui.base.StatusData
-import com.jvmartinez.finanzapp.ui.base.ViewToolbar
 import com.jvmartinez.finanzapp.ui.home.items.ItemTitleWithButton
 import com.jvmartinez.finanzapp.ui.home.items.ItemTransaction
+import com.jvmartinez.finanzapp.ui.home.items.ItemTransactionEmpty
 import com.jvmartinez.finanzapp.ui.model.BalanceView
+import com.jvmartinez.finanzapp.ui.theme.GrayDark
 import com.jvmartinez.finanzapp.ui.theme.Margins
 import com.jvmartinez.finanzapp.ui.theme.TextSizes
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScreenHome(
-    navigateToIncomeAndExpenses: () -> Unit = {}
+    navigateToIncomeAndExpenses: () -> Unit = {},
+    navigateToDetails: () -> Unit,
 ) {
     val viewModel: HomeViewModel = hiltViewModel()
     val onBalanceView by viewModel.onLoadingData().observeAsState(initial = StatusData.Empty)
+    var showSheet by remember { mutableStateOf(false) }
+    val currentCountry by viewModel.getCurrencyKey().observeAsState()
     if (onBalanceView is StatusData.Empty) {
         viewModel.getBalance()
     }
-    Scaffold(
-        topBar = { ViewToolbar() }
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animate))
         when (onBalanceView) {
             is StatusData.Error -> CustomDialogBase(
@@ -80,16 +92,41 @@ fun ScreenHome(
             is StatusData.Success -> {
                 val balanceView = (onBalanceView as StatusData.Success).data
                 Column(modifier = Modifier.padding(innerPadding)) {
-                    CardBalance(balanceView.balance.orEmpty())
-                    ScrollContent(balanceView, navigateToIncomeAndExpenses)
+                    CardBalance(
+                        balanceView.balance.orEmpty(),
+                        currentCountry = currentCountry?.first.orEmpty()
+                    ) { showSheet = true }
+                    ScrollContent(
+                        balanceView,
+                        navigateToIncomeAndExpenses
+                    ) {
+                        navigateToDetails()
+                    }
                 }
             }
+        }
+
+        if (showSheet) {
+            val context = LocalContext.current
+            BottomSheetCountries(
+                onDismiss = { showSheet = false },
+                onSelect = {
+                    viewModel.onSelectedCountry(it)
+                    viewModel.getBalance()
+                    showSheet = false
+                },
+                countries = viewModel.getCountries(context)?.countries.orEmpty()
+            )
         }
     }
 }
 
 @Composable
-fun ScrollContent(balanceView: BalanceView?, navigateToIncomeAndExpenses: () -> Unit) {
+fun ScrollContent(
+    balanceView: BalanceView?,
+    navigateToIncomeAndExpenses: () -> Unit,
+    showTransaction: () -> Unit
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
@@ -109,8 +146,15 @@ fun ScrollContent(balanceView: BalanceView?, navigateToIncomeAndExpenses: () -> 
             ItemTitleWithButton(
                 stringResource(id = R.string.copy_title_transactions),
                 stringResource(id = R.string.copy_see_all),
-                action = { }
+                action = {
+                    showTransaction()
+                }
             )
+        }
+        if (balanceView?.transactions.orEmpty().isEmpty()) {
+            item {
+                ItemTransactionEmpty()
+            }
         }
         items(balanceView?.transactions.orEmpty()) { transaction ->
             ItemTransaction(transactionView = transaction)
@@ -119,7 +163,7 @@ fun ScrollContent(balanceView: BalanceView?, navigateToIncomeAndExpenses: () -> 
 }
 
 @Composable
-fun CardBalance(balance: String) {
+fun CardBalance(balance: String, currentCountry: String, showSheet: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -139,12 +183,12 @@ fun CardBalance(balance: String) {
             CardItemIconTopEnd()
             CardItemInformation(balance)
         }
-        CardItemBalanceFooter()
+        CardItemBalanceFooter(showSheet = showSheet, currentCountry = currentCountry)
     }
 }
 
 @Composable
-fun CardItemBalanceFooter() {
+fun CardItemBalanceFooter(showSheet: () -> Unit, currentCountry: String) {
     Box(
         contentAlignment = Alignment.BottomStart,
         modifier = Modifier
@@ -163,9 +207,12 @@ fun CardItemBalanceFooter() {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Row {
+            Row(
+                modifier = Modifier
+                    .background(color = Color.Transparent),
+            ) {
                 TextCustom(
-                    title = stringResource(id = R.string.copy_my_wallet),
+                    title = stringResource(id = R.string.copy_my_currency),
                     textColor = Color.White,
                     modifier = Modifier
                         .weight(1f)
@@ -173,9 +220,27 @@ fun CardItemBalanceFooter() {
                         .padding(end = Margins.Medium),
                     textAlign = TextAlign.End
                 )
-                ImageBasic(
-                    resourceDrawable = R.drawable.ic_bg_white_arrow_next,
-                )
+                Card(
+                    shape = RoundedCornerShape(Margins.Medium),
+                    elevation = CardDefaults.cardElevation(defaultElevation = Margins.Medium),
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .height(Margins.Huge)
+                        .background(color = Color.Transparent),
+                    colors = CardDefaults.cardColors(GrayDark),
+
+                    ) {
+                    ButtonTransparentBasic(
+                        title = currentCountry,
+                        action = {
+                            showSheet()
+                        },
+                        textColor = Color.White,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .background(color = Color.Transparent),
+                    )
+                }
             }
         }
     }
@@ -186,7 +251,7 @@ fun CardItemInformation(balance: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(Margins.Large)
     ) {
         LazyColumn {
             item {
@@ -203,7 +268,7 @@ fun CardItemInformation(balance: String) {
                     isBold = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 4.dp)
+                        .padding(top = Margins.Medium)
                 )
             }
         }
@@ -226,7 +291,7 @@ fun SubCardBalance(balanceView: BalanceView?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(Margins.HeightSmall)
             .clickable { }
             .padding(start = Margins.Large, end = Margins.Large)
             .background(color = Color.White),

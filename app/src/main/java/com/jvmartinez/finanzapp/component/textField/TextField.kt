@@ -1,6 +1,7 @@
 package com.jvmartinez.finanzapp.component.textField
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
@@ -8,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.jvmartinez.finanzapp.component.text.TextCustom
@@ -25,7 +27,9 @@ fun TextFieldBasic(
     placeholder: String = "",
     modifier: Modifier,
     textCustom: TextFieldColors? = null,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    isOnlyNumber: Boolean = false,
+    isEnable: Boolean = true
     ) {
     TextField(
         value = value,
@@ -43,6 +47,12 @@ fun TextFieldBasic(
                 title = placeholder
             )
         },
+        enabled = isEnable,
+        keyboardOptions = if(isOnlyNumber) {
+            KeyboardOptions(keyboardType = KeyboardType.Number)
+        } else {
+            KeyboardOptions.Default
+        },
         modifier = modifier,
         textStyle = TextStyle(color = Color.Black),
         shape = RoundedCornerShape(Margins.Medium),
@@ -53,7 +63,8 @@ fun TextFieldBasic(
                 focusedContainerColor = Color.White,
                 unfocusedIndicatorColor = MissGrey,
                 focusedIndicatorColor = MissGrey,
-                cursorColor = GrayDark
+                cursorColor = GrayDark,
+                disabledContainerColor = Color.White
             )
     )
 }

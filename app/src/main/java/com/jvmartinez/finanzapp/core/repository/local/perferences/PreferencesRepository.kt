@@ -50,6 +50,60 @@ class PreferencesRepository @Inject constructor(
         }
     }
 
+    override suspend fun getCurrencyKey(): Result<String> {
+        return Result.runCatching {
+            val flow = userDataStorePreferences.data
+                .catch { exception ->
+
+                    if (exception is IOException) {
+                        emit(emptyPreferences())
+                    } else {
+                        throw exception
+                    }
+                }
+                .map { preferences ->
+                    preferences[KEY_CURRENCY_KEY]
+                }
+            val value = flow.firstOrNull() ?: ""
+            value
+        }
+    }
+
+    override suspend fun setCurrencyKey(name: String) {
+        Result.runCatching {
+            userDataStorePreferences.edit { preferences ->
+                preferences[KEY_CURRENCY_KEY] = name
+            }
+        }
+    }
+
+    override suspend fun getSymbolKey(): Result<String> {
+        return Result.runCatching {
+            val flow = userDataStorePreferences.data
+                .catch { exception ->
+
+                    if (exception is IOException) {
+                        emit(emptyPreferences())
+                    } else {
+                        throw exception
+                    }
+                }
+                .map { preferences ->
+                    preferences[KEY_SYMBOL_KEY]
+                }
+            val value = flow.firstOrNull() ?: ""
+            value
+        }
+    }
+
+    override suspend fun setSymbolKey(name: String) {
+        Result.runCatching {
+            userDataStorePreferences.edit { preferences ->
+                preferences[KEY_SYMBOL_KEY] = name
+            }
+        }
+    }
+
     override suspend fun getUserToken(): Result<String> {
         return Result.runCatching {
             val flow = userDataStorePreferences.data
@@ -106,6 +160,12 @@ class PreferencesRepository @Inject constructor(
         )
         val KEY_USER_KEY = stringPreferencesKey(
             name = "USER_KEY"
+        )
+        val KEY_CURRENCY_KEY = stringPreferencesKey(
+            name = "CURRENCY_KEY"
+        )
+        val KEY_SYMBOL_KEY = stringPreferencesKey(
+            name = "SYMBOL_KEY"
         )
     }
 }

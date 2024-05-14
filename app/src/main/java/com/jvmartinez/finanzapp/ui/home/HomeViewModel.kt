@@ -1,11 +1,16 @@
 package com.jvmartinez.finanzapp.ui.home
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.jvmartinez.finanzapp.R
 import com.jvmartinez.finanzapp.core.model.Balance
+import com.jvmartinez.finanzapp.core.model.Countries
+import com.jvmartinez.finanzapp.core.model.Country
 import com.jvmartinez.finanzapp.core.model.Transaction
 import com.jvmartinez.finanzapp.core.model.toBalanceView
 import com.jvmartinez.finanzapp.core.model.toTransactionViews
@@ -31,14 +36,29 @@ class HomeViewModel @Inject constructor(
 
     private val loadingData = MutableLiveData<StatusData<BalanceView>>(StatusData.Empty)
 
+    private val currencyKey = MutableLiveData(Pair("USD", "$"))
+
+
+    init {
+        viewModelScope.launch {
+            setCurrencyKey(
+                Pair(
+                    preferencesRepository.getCurrencyKey().getOrNull() ?: "USD",
+                    preferencesRepository.getSymbolKey().getOrNull() ?: "$"
+                )
+            )
+        }
+    }
 
     fun getBalance() {
         viewModelScope.launch {
-            Log.d("HomeViewModel", "getBalance: ${preferencesRepository.getUserKey()}")
             loadingData.postValue(StatusData.Loading)
             generateCombineSelectDB().catch {
                 processRemote()
             }.collect { (balance, transaction) ->
+                balance.balance = ((balance.income ?: 0.0) - (balance.outcome ?: 0.0))
+                balance.income = transaction.filter { it.type == 1 }.sumOf { it.amount }
+                balance.outcome = transaction.filter { it.type == 2 }.sumOf { it.amount }
                 updateData(balance, transaction)
             }
         }
@@ -52,7 +72,7 @@ class HomeViewModel @Inject constructor(
                 repositoryDB.saveBalance(balance)
                 it.second.let { transaction ->
                     if (transaction.isNotEmpty()) {
-                        transaction.forEach { trans ->
+                        transaction.filter { trans -> trans.amount != 0.0 }.forEach { trans ->
                             repositoryDB.saveTransaction(trans)
                         }
                     }
@@ -65,7 +85,12 @@ class HomeViewModel @Inject constructor(
     private fun updateData(balance: Balance, transaction: List<Transaction>) {
         loadingData.postValue(
             StatusData.Success(
-                balance.toBalanceView(transaction.toTransactionViews())
+                balance.toBalanceView(
+                    transaction.toTransactionViews(
+                        getCurrencyKey().value?.second.orEmpty()
+                    ),
+                    getCurrencyKey().value?.second.orEmpty()
+                )
             )
         )
     }
@@ -91,7 +116,7 @@ class HomeViewModel @Inject constructor(
             }
             lateinit var transaction: List<Transaction>
             repositoryDB.getTransactions().collect {
-                transaction = it
+                transaction = it.filter { trans -> trans.amount != 0.0 }
             }
             emit(Pair(balance, transaction))
         }
@@ -100,5 +125,29 @@ class HomeViewModel @Inject constructor(
     fun onLoadingData(): LiveData<StatusData<BalanceView>> = loadingData
     fun onDismissDialog() {
         loadingData.value = StatusData.Empty
+    }
+
+    fun getCountries(context: Context): Countries? {
+        val jsonString = context.resources.openRawResource(R.raw.countries)
+        val mapper = jacksonObjectMapper()
+        val countriesJson = mapper.readValue(jsonString, Countries::class.java)
+        return countriesJson
+    }
+
+    fun onSelectedCountry(country: Country) {
+        Log.d("Country", country.name)
+        viewModelScope.launch {
+            preferencesRepository.setCurrencyKey(country.currency)
+            preferencesRepository.setSymbolKey(country.symbol)
+        }
+        setCurrencyKey(Pair(country.currency, country.symbol))
+    }
+
+    fun getCurrencyKey(): LiveData<Pair<String, String>> {
+        return currencyKey
+    }
+
+    private fun setCurrencyKey(key: Pair<String, String>) {
+        currencyKey.value = key
     }
 }

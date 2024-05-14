@@ -9,4 +9,5 @@ sealed class RouterScreen(
     object SplashToLoginScreen : RouterScreen("splashToLogin")
     object SplashToHomeScreen : RouterScreen("splashToHome")
     object HomeToIncomeAndExpensesScreen: RouterScreen("homeToIncomeAndExpenses")
+    object HomeToDetailsScreen: RouterScreen("homeToDetails")
 }

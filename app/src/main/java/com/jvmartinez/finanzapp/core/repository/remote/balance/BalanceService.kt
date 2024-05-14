@@ -18,10 +18,10 @@ interface BalanceService {
     suspend fun findByUserId(): ResponseBasic<Balance>
 
     @POST("/newBalance/add")
-    suspend fun save(balance: Balance): ResponseBasic<Balance>
+    suspend fun save(@Body balance: Balance): ResponseBasic<Balance>
 
     @PUT("/balance/update")
-    suspend fun update(balance: Balance): ResponseBasic<Balance>
+    suspend fun update(@Body balance: Balance): ResponseBasic<Balance>
 
     @DELETE("/balance/delete")
     suspend fun delete(id: String): ResponseBasic<Boolean>

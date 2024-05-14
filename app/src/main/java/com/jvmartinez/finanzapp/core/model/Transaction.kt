@@ -3,6 +3,7 @@ package com.jvmartinez.finanzapp.core.model
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.jvmartinez.finanzapp.core.entity.EntityTransaction
 import com.jvmartinez.finanzapp.ui.model.TransactionView
+import com.jvmartinez.finanzapp.utils.Utils.formatAmount
 
 data class Transaction(
     @JsonProperty("id") val id: Double,
@@ -31,10 +32,10 @@ fun List<Transaction>.toEntity(user: String): List<EntityTransaction> {
     return map { it.toEntity(user) }
 }
 
-fun Transaction.toTransactionView(): TransactionView {
+fun Transaction.toTransactionView(symbol: String): TransactionView {
     return TransactionView(
         id = id,
-        amount = amount.toString(),
+        amount = formatAmount(amount, symbol),
         date = date,
         description = description,
         type = type,
@@ -42,6 +43,6 @@ fun Transaction.toTransactionView(): TransactionView {
     )
 }
 
-fun List<Transaction>.toTransactionViews(): List<TransactionView> {
-    return map { it.toTransactionView() }
+fun List<Transaction>.toTransactionViews(symbol: String): List<TransactionView> {
+    return map { it.toTransactionView(symbol) }
 }
