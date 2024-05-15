@@ -8,8 +8,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.jvmartinez.finanzapp.ui.credential.ScreenLogin
 import com.jvmartinez.finanzapp.ui.credential.ScreenSignUp
+import com.jvmartinez.finanzapp.ui.detail.ScreenDetailTransaction
 import com.jvmartinez.finanzapp.ui.home.ScreenHome
-import com.jvmartinez.finanzapp.ui.income.IncomeAndOutComeScreen
+import com.jvmartinez.finanzapp.ui.income.TabScreen
 import com.jvmartinez.finanzapp.ui.splash.ScreenSplash
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -38,6 +39,8 @@ fun NavGraph(
         ) {
             ScreenHome(navigateToIncomeAndExpenses = {
                 navController.navigate(RouterScreen.HomeToIncomeAndExpensesScreen.route)
+            }, navigateToDetails = {
+                navController.navigate(RouterScreen.HomeToDetailsScreen.route)
             })
         }
 
@@ -68,13 +71,23 @@ fun NavGraph(
             ScreenHome(
                 navigateToIncomeAndExpenses = {
                     navController.navigate(RouterScreen.HomeToIncomeAndExpensesScreen.route)
+                },
+                navigateToDetails = {
+                    navController.navigate(RouterScreen.HomeToDetailsScreen.route)
                 }
             )
         }
         composable(
             route = RouterScreen.HomeToIncomeAndExpensesScreen.route
         ) {
-            IncomeAndOutComeScreen(
+            TabScreen(
+                navigationBack = { navController.popBackStack() },
+            )
+        }
+        composable(
+            route = RouterScreen.HomeToDetailsScreen.route
+        ) {
+            ScreenDetailTransaction(
                 navigationBack = { navController.popBackStack() },
             )
         }

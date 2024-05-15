@@ -3,6 +3,9 @@ package com.jvmartinez.finanzapp.utils
 import android.content.Context
 import com.jvmartinez.finanzapp.R
 import com.jvmartinez.finanzapp.core.model.CategoryModel
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 object Utils {
     fun getListCategoryIncome(context: Context): MutableList<CategoryModel> {
@@ -127,5 +130,16 @@ object Utils {
             )
         )
         return categories
+    }
+
+    fun formatAmount(amount: Double, symbol: String): String {
+        return "$symbol ${String.format(Locale.getDefault(), "%.2f", amount)}"
+    }
+
+    fun getFormattedDate(timeInMillis: Long): String{
+        val calender = Calendar.getInstance()
+        calender.timeInMillis = timeInMillis
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy")
+        return dateFormat.format(calender.timeInMillis)
     }
 }

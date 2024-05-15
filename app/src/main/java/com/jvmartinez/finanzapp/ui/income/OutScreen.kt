@@ -64,31 +64,34 @@ import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun IncomeScreen(
+fun OutcomeScreen(
     viewModel: IncomeAndOutComeViewModel = hiltViewModel(),
-    navigationBack: () -> Boolean = { false }
+    navigationBack: () -> Boolean = { false },
 ) {
-    viewModel.clear()
     Scaffold {
         Column(
             modifier = Modifier
                 .padding(it)
                 .fillMaxWidth()
         ) {
-            FormIncomeAndOutComeScreen(viewModel)
-            Content(viewModel, navigationBack)
+            viewModel.clear()
+            FormOutComeScreen(viewModel)
+            ContentOutCome(viewModel, navigationBack)
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Content(viewModel: IncomeAndOutComeViewModel, navigationBack: () -> Boolean) {
+fun ContentOutCome(
+    viewModel: IncomeAndOutComeViewModel,
+    navigationBack: () -> Boolean
+) {
     val context = LocalContext.current
-    val categories by viewModel.getCategories().observeAsState(initial = listOf())
+    val categories by viewModel.getOutComeCategories().observeAsState(initial = listOf())
     val enableButton by viewModel.onEnableButtonIncome().observeAsState(initial = false)
     if (categories.isEmpty()) {
-        viewModel.setCategories(Utils.getListCategoryIncome(context))
+        viewModel.setOutComeCategories(Utils.getListCategoryExpenses(context))
     }
     LazyColumn(
         modifier = Modifier
@@ -96,14 +99,21 @@ fun Content(viewModel: IncomeAndOutComeViewModel, navigationBack: () -> Boolean)
             .padding(top = Margins.Medium)
     ) {
         item {
+            Spacer(
+                modifier = Modifier
+                    .height(Margins.Micro)
+                    .background(GrayDark)
+            )
+        }
+        item {
             val itemSize: Dp = (LocalConfiguration.current.screenWidthDp.dp / 3)
             FlowRow {
                 categories.forEach {
-                    ItemIncomeScreen(
+                    ItemOutScreen(
                         it,
                         itemSize,
                     ) { category ->
-                        viewModel.setTpeTransaction(category, 1)
+                        viewModel.setTpeTransaction(category, 2)
                     }
                 }
             }
@@ -115,7 +125,6 @@ fun Content(viewModel: IncomeAndOutComeViewModel, navigationBack: () -> Boolean)
                     .background(GrayDark)
             )
             ButtonBlackWithLetterWhite(
-                isEnabled = enableButton,
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
@@ -123,8 +132,9 @@ fun Content(viewModel: IncomeAndOutComeViewModel, navigationBack: () -> Boolean)
                     .padding(top = Margins.Large),
                 title = stringResource(id = R.string.title_button_save),
                 action = {
-                    viewModel.save(1)
-                }
+                    viewModel.save(2)
+                },
+                isEnabled = enableButton
             )
             ButtonTransparentBasic(
                 modifier = Modifier
@@ -144,10 +154,11 @@ fun Content(viewModel: IncomeAndOutComeViewModel, navigationBack: () -> Boolean)
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormIncomeAndOutComeScreen(viewModel: IncomeAndOutComeViewModel) {
+fun FormOutComeScreen(viewModel: IncomeAndOutComeViewModel) {
     val date by viewModel.onDate().observeAsState(initial = "")
     val description by viewModel.getDescription().observeAsState(initial = "")
     val amount by viewModel.getAmount().observeAsState(initial = "")
+
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -191,13 +202,10 @@ fun FormIncomeAndOutComeScreen(viewModel: IncomeAndOutComeViewModel) {
         if (showDialog) {
             ItemDatePicker(
                 {
+                    showDialog = false
                     viewModel.processDate(state.selectedDateMillis)
-                    showDialog = false
                 },
-                {
-                    viewModel.processDate(null)
-                    showDialog = false
-                },
+                { showDialog = false },
                 state,
                 dateFormatter
             )
@@ -228,7 +236,7 @@ fun FormIncomeAndOutComeScreen(viewModel: IncomeAndOutComeViewModel) {
 }
 
 @Composable
-fun ItemIncomeScreen(
+fun ItemOutScreen(
     categoryModel: CategoryModel,
     itemSize: Dp,
     selectCategory: (CategoryModel) -> Unit
@@ -295,5 +303,4 @@ fun ItemIncomeScreen(
             )
         }
     }
-
 }

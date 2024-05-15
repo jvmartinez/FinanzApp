@@ -13,4 +13,12 @@ interface IPreferencesRepository {
     suspend fun getUserKey(): Result<String>
 
     suspend fun setUserKey(name: String)
+
+    suspend fun getCurrencyKey(): Result<String>
+
+    suspend fun setCurrencyKey(name: String)
+
+    suspend fun getSymbolKey(): Result<String>
+
+    suspend fun setSymbolKey(name: String)
 }

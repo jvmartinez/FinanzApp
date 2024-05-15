@@ -50,4 +50,12 @@
     <string name="title_button_save">Guardar</string>
     <string name="amount">Monto</string>
     <string name="description">Descripcion</string>
+    <string name="income">Income</string>
+    <string name="out_come">Outcome</string>
+    <string name="title_button_back">Back</string>
+    <string name="copy_my_currency">Moneda</string>
+    <string name="copy_field_search">Buscar moneda</string>
+    <string name="copy_field_date_start">Desde</string>
+    <string name="copy_field_date_end">Hasta</string>
+    <string name="copy_title_empty">No hay datos</string>
 </resources>

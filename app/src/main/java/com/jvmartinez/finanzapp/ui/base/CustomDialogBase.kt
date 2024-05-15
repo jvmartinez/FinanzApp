@@ -1,6 +1,8 @@
 package com.jvmartinez.finanzapp.ui.base
 
+import android.os.Build
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
@@ -20,6 +22,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerFormatter
+import androidx.compose.material3.DatePickerState
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.DateRangePickerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,12 +50,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.jvmartinez.finanzapp.R
+import com.jvmartinez.finanzapp.component.button.ButtonBlackWithLetterWhite
+import com.jvmartinez.finanzapp.component.button.ButtonTransparentBasic
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
+import com.jvmartinez.finanzapp.ui.theme.GREEN
 import com.jvmartinez.finanzapp.ui.theme.GrayDark
 import com.jvmartinez.finanzapp.ui.theme.HitGray
 import com.jvmartinez.finanzapp.ui.theme.Margins
 import com.jvmartinez.finanzapp.ui.theme.RedLight
+import com.jvmartinez.finanzapp.ui.theme.bgBase
 
 @Composable
 fun CustomDialogBase(
@@ -226,4 +240,86 @@ fun PreviewResetWarning() {
             )
         }
     )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun ItemDatePicker(
+    onAccept: () -> Unit,
+    onDismiss: () -> Unit,
+    state: DatePickerState,
+    dateFormatter: DatePickerFormatter,
+) {
+    DatePickerDialog(
+        onDismissRequest = { onDismiss() },
+        confirmButton = {
+            ButtonBlackWithLetterWhite(
+                title = stringResource(id = R.string.title_button_accept),
+                action = { onAccept() },
+                isEnabled = true
+            )
+            ButtonTransparentBasic(
+                title = stringResource(id = R.string.title_button_cancel),
+                action = {
+                    onDismiss()
+                }
+            )
+        }
+    ) {
+        DatePicker(
+            showModeToggle = false,
+            dateFormatter = dateFormatter,
+            state = state,
+            colors = DatePickerDefaults.colors(
+                todayDateBorderColor = GREEN,
+                dayInSelectionRangeContentColor = GrayDark,
+                dayInSelectionRangeContainerColor = GrayDark,
+                selectedDayContainerColor = GREEN,
+                todayContentColor = GrayDark
+            )
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun ItemDatePicker(
+    onAccept: () -> Unit,
+    onDismiss: () -> Unit,
+    stateRange: DateRangePickerState,
+    dateFormatter: DatePickerFormatter,
+) {
+    DatePickerDialog(
+        onDismissRequest = { onDismiss() },
+        confirmButton = {
+            ButtonBlackWithLetterWhite(
+                title = stringResource(id = R.string.title_button_accept),
+                action = { onAccept() },
+                isEnabled = true
+            )
+            ButtonTransparentBasic(
+                title = stringResource(id = R.string.title_button_cancel),
+                action = {
+                    onDismiss()
+                }
+            )
+        }
+    ) {
+        DateRangePicker(
+            showModeToggle = true,
+            dateFormatter = dateFormatter,
+            state = stateRange,
+            colors = DatePickerDefaults.colors(
+                todayDateBorderColor = GREEN,
+                dayInSelectionRangeContentColor = Color.White,
+                dayInSelectionRangeContainerColor = bgBase,
+                selectedDayContainerColor = GREEN,
+                todayContentColor = GrayDark
+            ),
+            modifier = Modifier.weight(1f)
+        )
+    }
 }

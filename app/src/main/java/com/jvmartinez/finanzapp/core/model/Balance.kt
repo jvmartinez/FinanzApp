@@ -4,21 +4,22 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.jvmartinez.finanzapp.core.entity.EntityBalance
 import com.jvmartinez.finanzapp.ui.model.BalanceView
 import com.jvmartinez.finanzapp.ui.model.TransactionView
+import com.jvmartinez.finanzapp.utils.Utils.formatAmount
 
 data class Balance(
     @JsonProperty("id") val id: String,
-    @JsonProperty("balance") val balance: Double?,
-    @JsonProperty("income") val income: Double?,
-    @JsonProperty("outcome") val outcome: Double?,
+    @JsonProperty("balance") var balance: Double?,
+    @JsonProperty("income") var income: Double?,
+    @JsonProperty("outcome") var outcome: Double?,
     @JsonProperty("create_at") val createAt: String?,
     @JsonProperty("update_at") val updateAt: String?
 )
 
-fun Balance.toBalanceView(transactionView: List<TransactionView>): BalanceView {
+fun Balance.toBalanceView(transactionView: List<TransactionView>, symbol: String): BalanceView {
     return BalanceView(
-        balance = balance.toString(),
-        income = income.toString(),
-        outcome = outcome.toString(),
+        balance = formatAmount(balance ?: 0.0, symbol),
+        income = formatAmount(income ?: 0.0, symbol),
+        outcome = formatAmount(outcome ?: 0.0, symbol),
         transactions = transactionView,
         createAt = createAt,
         updateAt = updateAt

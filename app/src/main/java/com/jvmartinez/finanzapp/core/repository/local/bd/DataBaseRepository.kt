@@ -2,6 +2,7 @@ package com.jvmartinez.finanzapp.core.repository.local.bd
 
 import com.jvmartinez.finanzapp.core.dao.BalanceDao
 import com.jvmartinez.finanzapp.core.dao.TransactionDao
+import com.jvmartinez.finanzapp.core.entity.EntityBalance
 import com.jvmartinez.finanzapp.core.entity.EntityTransaction
 import com.jvmartinez.finanzapp.core.entity.toBalance
 import com.jvmartinez.finanzapp.core.entity.toListModel
@@ -51,4 +52,30 @@ class DataBaseRepository @Inject constructor(
 
     suspend fun updateTransaction(transaction: EntityTransaction) =
         transactionDao.update(transaction)
+
+    suspend fun updateBalance(balance: EntityBalance) {
+        balanceDao.update(balance)
+    }
+
+    suspend fun sumIncomeOrOutcomeTotal(type: Int): Flow<Double> = flow {
+        emit(
+            transactionDao.sumIncomeOrOutcomeTotal(
+                preferences.getUserKey().getOrNull().orEmpty(),
+                type
+            )
+        )
+    }
+
+    suspend fun findAllByDates(
+        startDate: String,
+        endDate: String
+    ): Flow<List<Transaction>> = flow {
+        emit(
+            transactionDao.findAllByDate(
+                preferences.getUserKey().getOrNull().orEmpty(),
+                startDate,
+                endDate
+            ).toListModel()
+        )
+    }
 }
