@@ -10,7 +10,7 @@
 .cxx
 local.properties
 /.idea/kotlinc.xml
-./app//release/app-release.aab
+./app/release/app-release.aab
 env.properties
 
 # Proguard
