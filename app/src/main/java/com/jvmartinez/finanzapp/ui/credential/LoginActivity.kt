@@ -135,16 +135,6 @@ fun ContentLogin(
             ItemSpacerOr()
         }
         item {
-            ButtonGoogle(
-                title = stringResource(id = R.string.copy_login_with_google),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = Margins.Large)
-                    .padding(top = Margins.ExtraLarge)
-
-            )
-        }
-        item {
             ButtonTransparentBasic(
                 title = stringResource(id = R.string.copy_label_sign_up),
                 action = { navigateToSignUp() },
