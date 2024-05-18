@@ -91,6 +91,8 @@ class CredentialViewModel @Inject constructor(
                 preferencesRepository.setUserKey(it.data.id.orEmpty())
                 preferencesRepository.setUserToken(it.data.token.orEmpty())
                 preferencesRepository.setUserName(it.data.name.orEmpty())
+                preferencesRepository.setSymbolKey("$")
+                preferencesRepository.setCurrencyKey("USD")
                 loadingData.value = StatusData.Success(it.code == OK_CODE)
             }
         }
@@ -107,6 +109,8 @@ class CredentialViewModel @Inject constructor(
                 preferencesRepository.setUserKey(it.data.id.orEmpty())
                 preferencesRepository.setUserName(it.data.name.orEmpty())
                 preferencesRepository.setUserToken(it.data.token.orEmpty())
+                preferencesRepository.setSymbolKey("$")
+                preferencesRepository.setCurrencyKey("USD")
                 loadingData.value = StatusData.Success(it.code == OK_CODE)
             }
         }

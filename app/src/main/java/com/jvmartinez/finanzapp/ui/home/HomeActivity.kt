@@ -42,6 +42,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.jvmartinez.finanzapp.R
 import com.jvmartinez.finanzapp.component.button.BottomSheetCountries
+import com.jvmartinez.finanzapp.component.button.ButtonBlackWithLetterWhite
 import com.jvmartinez.finanzapp.component.button.ButtonTransparentBasic
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
@@ -61,6 +62,7 @@ import com.jvmartinez.finanzapp.ui.theme.TextSizes
 fun ScreenHome(
     navigateToIncomeAndExpenses: () -> Unit = {},
     navigateToDetails: () -> Unit,
+    navigateToLogin: () -> Unit
 ) {
     val viewModel: HomeViewModel = hiltViewModel()
     val onBalanceView by viewModel.onLoadingData().observeAsState(initial = StatusData.Empty)
@@ -92,6 +94,21 @@ fun ScreenHome(
             is StatusData.Success -> {
                 val balanceView = (onBalanceView as StatusData.Success).data
                 Column(modifier = Modifier.padding(innerPadding)) {
+                    ButtonTransparentBasic(
+                        title = stringResource(
+                            id = R.string.copy_sign_out
+                        ),
+                        action = {
+                            viewModel.onSignOut()
+                            navigateToLogin()
+                        },
+                        textColor = Color.Black,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = Margins.Medium)
+                            .padding(horizontal = Margins.Large),
+                        textAlign = TextAlign.End
+                    )
                     CardBalance(
                         balanceView.balance.orEmpty(),
                         currentCountry = currentCountry?.first.orEmpty()

@@ -41,7 +41,10 @@ fun NavGraph(
                 navController.navigate(RouterScreen.HomeToIncomeAndExpensesScreen.route)
             }, navigateToDetails = {
                 navController.navigate(RouterScreen.HomeToDetailsScreen.route)
-            })
+            }, navigateToLogin = {
+                navController.navigate(RouterScreen.HomeToLogin.route)
+            }
+            )
         }
 
         composable(
@@ -74,6 +77,9 @@ fun NavGraph(
                 },
                 navigateToDetails = {
                     navController.navigate(RouterScreen.HomeToDetailsScreen.route)
+                },
+                navigateToLogin = {
+                    navController.navigate(RouterScreen.HomeToLogin.route)
                 }
             )
         }
@@ -89,6 +95,18 @@ fun NavGraph(
         ) {
             ScreenDetailTransaction(
                 navigationBack = { navController.popBackStack() },
+            )
+        }
+        composable(
+            route = RouterScreen.HomeToLogin.route
+        ) {
+            ScreenLogin(
+                navigateToSignUp = {
+                    navController.navigate(RouterScreen.LoginToSignUpScreen.route)
+                },
+                navigateToHome = {
+                    navController.navigate(RouterScreen.LoginToHomeScreen.route)
+                }
             )
         }
     }

@@ -104,6 +104,14 @@ class PreferencesRepository @Inject constructor(
         }
     }
 
+    override suspend fun clearPreferences() {
+        setSymbolKey("")
+        setUserKey("")
+        setUserName("")
+        setUserToken("")
+        setCurrencyKey("")
+    }
+
     override suspend fun getUserToken(): Result<String> {
         return Result.runCatching {
             val flow = userDataStorePreferences.data

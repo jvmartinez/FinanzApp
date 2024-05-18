@@ -20,3 +20,4 @@ proguard-rules.pro
 # Others
 /.DS_Store
 Thumbs.db
+/app/release/app-release.aab

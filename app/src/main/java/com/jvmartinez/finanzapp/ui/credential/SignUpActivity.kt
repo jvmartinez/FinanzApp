@@ -1,6 +1,7 @@
 package com.jvmartinez.finanzapp.ui.credential
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,12 +17,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -36,8 +39,8 @@ import com.jvmartinez.finanzapp.ui.base.DialogWithOneAction
 import com.jvmartinez.finanzapp.ui.base.DialogWithoutAction
 import com.jvmartinez.finanzapp.ui.base.StatusData
 import com.jvmartinez.finanzapp.ui.base.ViewToolbar
+import com.jvmartinez.finanzapp.ui.base.WebView
 import com.jvmartinez.finanzapp.ui.theme.AccentBlue
-import com.jvmartinez.finanzapp.ui.theme.FinanzAppTheme
 import com.jvmartinez.finanzapp.ui.theme.GrayLight
 import com.jvmartinez.finanzapp.ui.theme.Margins
 import com.jvmartinez.finanzapp.ui.theme.TextSizes
@@ -105,72 +108,79 @@ fun ContentSignUp(innerPadding: PaddingValues, viewModel: CredentialViewModel) {
     val onValidPassword: Boolean by viewModel.onValidPassword().observeAsState(initial = false)
     val onValidEmail: Boolean by viewModel.onValidEmail().observeAsState(initial = false)
     val onValidName: Boolean by viewModel.onValidName().observeAsState(initial = false)
-
-    Column {
-        if (onValidPassword.not()) {
-            DialogWithoutAction(
-                R.string.copy_message_alert_password,
-                colorBackground = GrayLight,
-            )
-        }
-        if (onValidEmail.not()) {
-            DialogWithoutAction(
-                R.string.copy_message_alert_email,
-                colorBackground = GrayLight,
-                colorText = Color.White,
-            )
-        }
-        if (onValidName.not()) {
-            DialogWithoutAction(
-                R.string.copy_message_alert_name,
-                colorBackground = GrayLight,
-                colorText = Color.White,
-            )
-        }
-        LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            item {
-                ItemLogoSignUp()
-            }
-            item {
-                ItemTitleSignUp()
-            }
-            item {
-                ItemTextFieldName(
-                    name = name,
-                    onChangeName = {
-                        viewModel.onChanceTextFieldSignUp(
-                            it,
-                            email,
-                            password
-                        )
-                    })
-                ItemTextFieldEmail(
-                    email = email,
-                    onChangeEmail = {
-                        viewModel.onChanceTextFieldSignUp(
-                            name,
-                            it,
-                            password
-                        )
-                    })
-                ItemTextFieldPassword(
-                    password = password,
-                    onChangePassword = {
-                        viewModel.onChanceTextFieldSignUp(
-                            name,
-                            email,
-                            it
-                        )
-                    })
-            }
-            item {
-                ItemTermsAndConditions()
-            }
-            item {
-                ItemButtonSignUp(
-                    action = { viewModel.onSignUp() },
-                    isEnabled = toggleButton
+    var showTermsAndCondition by remember { mutableStateOf(false) }
+    val actionView: () -> Unit = {
+        showTermsAndCondition = true
+    }
+    if (showTermsAndCondition) {
+        WebView(url = "https://sites.google.com/view/finanz-app/p%C3%A1gina-principal")
+    } else {
+        Column {
+            if (onValidPassword.not()) {
+                DialogWithoutAction(
+                    R.string.copy_message_alert_password,
+                    colorBackground = GrayLight,
                 )
+            }
+            if (onValidEmail.not()) {
+                DialogWithoutAction(
+                    R.string.copy_message_alert_email,
+                    colorBackground = GrayLight,
+                    colorText = Color.White,
+                )
+            }
+            if (onValidName.not()) {
+                DialogWithoutAction(
+                    R.string.copy_message_alert_name,
+                    colorBackground = GrayLight,
+                    colorText = Color.White,
+                )
+            }
+            LazyColumn(modifier = Modifier.padding(innerPadding)) {
+                item {
+                    ItemLogoSignUp()
+                }
+                item {
+                    ItemTitleSignUp()
+                }
+                item {
+                    ItemTextFieldName(
+                        name = name,
+                        onChangeName = {
+                            viewModel.onChanceTextFieldSignUp(
+                                it,
+                                email,
+                                password
+                            )
+                        })
+                    ItemTextFieldEmail(
+                        email = email,
+                        onChangeEmail = {
+                            viewModel.onChanceTextFieldSignUp(
+                                name,
+                                it,
+                                password
+                            )
+                        })
+                    ItemTextFieldPassword(
+                        password = password,
+                        onChangePassword = {
+                            viewModel.onChanceTextFieldSignUp(
+                                name,
+                                email,
+                                it
+                            )
+                        })
+                }
+                item {
+                    ItemTermsAndConditions(actionView)
+                }
+                item {
+                    ItemButtonSignUp(
+                        action = { viewModel.onSignUp() },
+                        isEnabled = toggleButton
+                    )
+                }
             }
         }
     }
@@ -190,14 +200,16 @@ fun ItemButtonSignUp(action: () -> Unit = {}, isEnabled: Boolean) {
 }
 
 @Composable
-fun ItemTermsAndConditions() {
-
+fun ItemTermsAndConditions(actionView: () -> Unit) {
     TextCustom(
         title = stringResource(id = R.string.copy_terms_and_conditions),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = Margins.Large)
-            .padding(top = Margins.Huge),
+            .padding(top = Margins.Huge)
+            .clickable {
+                actionView()
+            },
         textColor = AccentBlue,
         textSize = TextSizes.Small,
         textAlign = TextAlign.Center
@@ -303,13 +315,3 @@ fun ItemLogoSignUp() {
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ScreenSignUpPreview() {
-    FinanzAppTheme {
-        ScreenSignUp(
-            navigationBack = { true },
-            navigateToHome = { }
-        )
-    }
-}

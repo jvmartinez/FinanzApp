@@ -21,4 +21,5 @@ interface IPreferencesRepository {
     suspend fun getSymbolKey(): Result<String>
 
     suspend fun setSymbolKey(name: String)
+    suspend fun clearPreferences()
 }

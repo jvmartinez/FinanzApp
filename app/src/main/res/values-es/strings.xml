@@ -1,7 +1,7 @@
 <resources>
     <string name="copy_title_button">Ganancias</string>
     <string name="copy_see_all">See All</string>
-    <string name="copy_title_transactions">Transacciones</string>
+    <string name="copy_title_transactions">Transacciones del mes</string>
     <string name="copy_title_balance">Total Balance</string>
     <string name="copy_my_wallet">Mi billetera</string>
     <string name="forgot_password">Has olvidado tu contraseña</string>
@@ -58,4 +58,5 @@
     <string name="copy_field_date_start">Desde</string>
     <string name="copy_field_date_end">Hasta</string>
     <string name="copy_title_empty">No hay datos</string>
+    <string name="copy_sign_out">Cerrar sesión</string>
 </resources>

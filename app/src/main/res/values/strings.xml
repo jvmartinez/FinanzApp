@@ -2,7 +2,7 @@
     <string name="app_name" translatable="false">Finanz App</string>
     <string name="copy_title_button">Earnings</string>
     <string name="copy_see_all">See All</string>
-    <string name="copy_title_transactions">Transactions</string>
+    <string name="copy_title_transactions">Transactions of the month</string>
     <string name="copy_title_balance">Total Balance</string>
     <string name="copy_my_wallet">My Wallet</string>
     <string name="title_activity_login" translatable="false">LoginActivity</string>
@@ -61,4 +61,5 @@
     <string name="copy_field_date_start">From</string>
     <string name="copy_field_date_end">to</string>
     <string name="copy_title_empty">No Data</string>
+    <string name="copy_sign_out">Sign Out</string>
 </resources>

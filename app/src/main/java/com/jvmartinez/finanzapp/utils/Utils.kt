@@ -1,9 +1,12 @@
 package com.jvmartinez.finanzapp.utils
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.jvmartinez.finanzapp.R
 import com.jvmartinez.finanzapp.core.model.CategoryModel
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Locale
 
@@ -141,5 +144,20 @@ object Utils {
         calender.timeInMillis = timeInMillis
         val dateFormat = SimpleDateFormat("dd-MM-yyyy")
         return dateFormat.format(calender.timeInMillis)
+    }
+
+    fun getFirstLastDayOfMonth(): Pair<Calendar, Calendar> {
+        val calendar = Calendar.getInstance()
+
+        // Set the day of the month to the first day of the current month
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        val firstDayOfMonth = calendar.clone() as Calendar
+
+        // Move to the last day of the current month
+        calendar.add(Calendar.MONTH, 1)
+        calendar.add(Calendar.DATE, -1)
+        val lastDayOfMonth = calendar
+
+        return Pair(firstDayOfMonth, lastDayOfMonth)
     }
 }

@@ -1,6 +1,7 @@
 package com.jvmartinez.finanzapp.ui.home
 
 import android.content.Context
+import android.icu.util.Calendar
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,6 +20,7 @@ import com.jvmartinez.finanzapp.core.repository.local.perferences.PreferencesRep
 import com.jvmartinez.finanzapp.core.repository.remote.balance.IRepositoryBalance
 import com.jvmartinez.finanzapp.ui.base.StatusData
 import com.jvmartinez.finanzapp.ui.model.BalanceView
+import com.jvmartinez.finanzapp.utils.Utils.getFirstLastDayOfMonth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -57,8 +59,8 @@ class HomeViewModel @Inject constructor(
                 processRemote()
             }.collect { (balance, transaction) ->
                 balance.balance = ((balance.income ?: 0.0) - (balance.outcome ?: 0.0))
-                balance.income = transaction.filter { it.type == 1 }.sumOf { it.amount }
-                balance.outcome = transaction.filter { it.type == 2 }.sumOf { it.amount }
+                balance.income = transaction.filter { it.type == 1 && it.amount > 0.0 }.sumOf { it.amount }
+                balance.outcome = transaction.filter { it.type == 2  && it.amount > 0.0 }.sumOf { it.amount }
                 updateData(balance, transaction)
             }
         }
@@ -72,7 +74,7 @@ class HomeViewModel @Inject constructor(
                 repositoryDB.saveBalance(balance)
                 it.second.let { transaction ->
                     if (transaction.isNotEmpty()) {
-                        transaction.filter { trans -> trans.amount != 0.0 }.forEach { trans ->
+                        transaction.filter { trans -> trans.amount > 0.0 }.forEach { trans ->
                             repositoryDB.saveTransaction(trans)
                         }
                     }
@@ -115,7 +117,12 @@ class HomeViewModel @Inject constructor(
                 balance = it
             }
             lateinit var transaction: List<Transaction>
-            repositoryDB.getTransactions().collect {
+            val (firstDayOfMonth, lastDayOfMonth) = getFirstLastDayOfMonth()
+            val firstDayFormatted = "${firstDayOfMonth.get(Calendar.DAY_OF_MONTH)}-${firstDayOfMonth.get(Calendar.MONTH) + 1}-${firstDayOfMonth.get(Calendar.YEAR)}"
+            val lastDayFormatted = "${lastDayOfMonth.get(Calendar.DAY_OF_MONTH)}-${lastDayOfMonth.get(Calendar.MONTH) + 1}-${lastDayOfMonth.get(Calendar.YEAR)}"
+            Log.d("firstDayFormatted", firstDayFormatted)
+            Log.d("lastDayFormatted", lastDayFormatted)
+            repositoryDB.findAllByDates(firstDayFormatted, lastDayFormatted).collect {
                 transaction = it.filter { trans -> trans.amount != 0.0 }
             }
             emit(Pair(balance, transaction))
@@ -135,7 +142,6 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onSelectedCountry(country: Country) {
-        Log.d("Country", country.name)
         viewModelScope.launch {
             preferencesRepository.setCurrencyKey(country.currency)
             preferencesRepository.setSymbolKey(country.symbol)
@@ -149,5 +155,11 @@ class HomeViewModel @Inject constructor(
 
     private fun setCurrencyKey(key: Pair<String, String>) {
         currencyKey.value = key
+    }
+
+    fun onSignOut() {
+        viewModelScope.launch {
+            preferencesRepository.clearPreferences()
+        }
     }
 }
