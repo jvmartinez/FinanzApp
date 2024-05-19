@@ -21,3 +21,4 @@ proguard-rules.pro
 /.DS_Store
 Thumbs.db
 /app/release/app-release.aab
+/.idea/

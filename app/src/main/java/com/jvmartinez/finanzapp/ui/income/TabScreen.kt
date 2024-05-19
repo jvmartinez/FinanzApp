@@ -12,7 +12,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -25,9 +25,9 @@ import com.jvmartinez.finanzapp.component.text.TextCustom
 @Composable
 fun TabScreen(
     viewModel: IncomeAndOutComeViewModel = hiltViewModel(),
-    navigationBack: () -> Boolean = { false }
+    navigationBack: () -> Unit = { }
 ) {
-    var tabIndex by remember { mutableStateOf(0) }
+    var tabIndex by remember { mutableIntStateOf(0) }
 
     val tabs = listOf(stringResource(id = R.string.income), stringResource(id = R.string.out_come))
 

@@ -66,7 +66,7 @@ import java.util.Calendar
 @Composable
 fun OutcomeScreen(
     viewModel: IncomeAndOutComeViewModel = hiltViewModel(),
-    navigationBack: () -> Boolean = { false },
+    navigationBack: () -> Unit = { false },
 ) {
     Scaffold {
         Column(
@@ -85,7 +85,7 @@ fun OutcomeScreen(
 @Composable
 fun ContentOutCome(
     viewModel: IncomeAndOutComeViewModel,
-    navigationBack: () -> Boolean
+    navigationBack: () -> Unit
 ) {
     val context = LocalContext.current
     val categories by viewModel.getOutComeCategories().observeAsState(initial = listOf())
@@ -258,7 +258,8 @@ fun ItemOutScreen(
         ) {
             Card(
                 modifier = Modifier
-                    .padding(Margins.XMedium)
+                    .padding(horizontal = Margins.XMedium)
+                    .padding(top = Margins.Small)
                     .align(Alignment.CenterHorizontally),
                 colors = CardDefaults.cardColors(Transparent)
 

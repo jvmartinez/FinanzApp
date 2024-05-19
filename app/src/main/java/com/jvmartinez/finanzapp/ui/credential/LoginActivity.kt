@@ -25,7 +25,6 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.jvmartinez.finanzapp.R
 import com.jvmartinez.finanzapp.component.button.ButtonBlackWithLetterWhite
-import com.jvmartinez.finanzapp.component.button.ButtonGoogle
 import com.jvmartinez.finanzapp.component.button.ButtonTransparentBasic
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
@@ -44,6 +43,7 @@ fun ScreenLogin(
     navigateToSignUp: () -> Unit,
     navigateToHome: () -> Unit,
     viewModel: CredentialViewModel = hiltViewModel(),
+    navigateToResetPassword: () -> Unit,
 ) {
     val onLoading by viewModel.onLoadingData().observeAsState(initial = StatusData.Empty)
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animate))
@@ -67,7 +67,7 @@ fun ScreenLogin(
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             when (onLoading) {
                 StatusData.Empty -> {
-                    ContentLogin(innerPadding, navigateToSignUp, viewModel)
+                    ContentLogin(innerPadding, navigateToSignUp, navigateToResetPassword, viewModel)
                 }
 
                 is StatusData.Error -> CustomDialogBase(
@@ -99,6 +99,7 @@ fun ScreenLogin(
 fun ContentLogin(
     innerPadding: PaddingValues,
     navigateToSignUp: () -> Unit,
+    navigateToResetPassword: () -> Unit,
     viewModel: CredentialViewModel
 ) {
     val email: String by viewModel.onEmail().observeAsState(initial = "")
@@ -126,7 +127,7 @@ fun ContentLogin(
             }
         }
         item {
-            ItemForgotPassword()
+            ItemForgotPassword(navigateToResetPassword)
         }
         item {
             ItemButtonLogin(toggleButton) { viewModel.onLogin() }

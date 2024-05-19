@@ -66,7 +66,7 @@ import java.util.Calendar
 @Composable
 fun IncomeScreen(
     viewModel: IncomeAndOutComeViewModel = hiltViewModel(),
-    navigationBack: () -> Boolean = { false }
+    navigationBack: () -> Unit = { false }
 ) {
     viewModel.clear()
     Scaffold {
@@ -83,7 +83,7 @@ fun IncomeScreen(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Content(viewModel: IncomeAndOutComeViewModel, navigationBack: () -> Boolean) {
+fun Content(viewModel: IncomeAndOutComeViewModel, navigationBack: () -> Unit) {
     val context = LocalContext.current
     val categories by viewModel.getCategories().observeAsState(initial = listOf())
     val enableButton by viewModel.onEnableButtonIncome().observeAsState(initial = false)

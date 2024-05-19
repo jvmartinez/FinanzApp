@@ -11,4 +11,5 @@ sealed class RouterScreen(
     object HomeToIncomeAndExpensesScreen: RouterScreen("homeToIncomeAndExpenses")
     object HomeToDetailsScreen: RouterScreen("homeToDetails")
     object HomeToLogin: RouterScreen("homeToLogin")
+    object ResetScreen: RouterScreen("resetScreen")
 }
