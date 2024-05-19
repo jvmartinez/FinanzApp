@@ -59,4 +59,8 @@
     <string name="copy_field_date_end">Hasta</string>
     <string name="copy_title_empty">No hay datos</string>
     <string name="copy_sign_out">Cerrar sesión</string>
+    <string name="copy_reset_password">¿Has olvidado tu contraseña?</string>
+    <string name="copy_sub_title_reset_pasword">¡No te preocupes! Esto sucede. Por favor, introduzca la dirección de correo electrónico asociado con su cuenta.</string>
+    <string name="copy_message_dialog_reset_password">Te hemos enviado un correo electrónico con las instrucciones para restablecer tu contraseña.</string>
+    <string name="copy_message_dialog_reset_password_error">No pudimos enviar el correo electrónico para restablecer tu contraseña. Inténtalo de nuevo, por favor.</string>
 </resources>

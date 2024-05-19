@@ -55,23 +55,10 @@ fun ScreenSignUp(
     val onLoading by viewModel.onLoadingData().observeAsState(initial = StatusData.Empty)
 
     Scaffold(
-        topBar = {
-            ViewToolbar(
-                title = stringResource(id = R.string.copy_title_sign_up),
-                action = {
-                    IconButton(onClick = {
-                        viewModel.onClearField()
-                        navigationBack()
-                    }) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
-                    }
-                }
-            )
-        },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
         when (onLoading) {
-            StatusData.Empty -> ContentSignUp(innerPadding, viewModel)
+            StatusData.Empty -> ContentSignUp(innerPadding, viewModel, navigationBack)
 
             is StatusData.Error -> {
                 CustomDialogBase(
@@ -100,7 +87,11 @@ fun ScreenSignUp(
 }
 
 @Composable
-fun ContentSignUp(innerPadding: PaddingValues, viewModel: CredentialViewModel) {
+fun ContentSignUp(
+    innerPadding: PaddingValues,
+    viewModel: CredentialViewModel,
+    navigationBack: () -> Boolean
+) {
     val email by viewModel.onEmail().observeAsState(initial = "")
     val password by viewModel.onPassword().observeAsState(initial = "")
     val name by viewModel.onName().observeAsState(initial = "")
@@ -116,6 +107,16 @@ fun ContentSignUp(innerPadding: PaddingValues, viewModel: CredentialViewModel) {
         WebView(url = "https://sites.google.com/view/finanz-app/p%C3%A1gina-principal")
     } else {
         Column {
+            ImageBasic(
+                resourceDrawable = R.drawable.ic_arrow_back_24,
+                modifier = Modifier
+                    .padding(top = Margins.Large)
+                    .padding(horizontal = Margins.Large)
+                    .clickable {
+                        viewModel.onClearField()
+                        navigationBack()
+                    }
+            )
             if (onValidPassword.not()) {
                 DialogWithoutAction(
                     R.string.copy_message_alert_password,

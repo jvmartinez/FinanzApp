@@ -71,6 +71,7 @@ fun ScreenHome(
     if (onBalanceView is StatusData.Empty) {
         viewModel.getBalance()
     }
+
     Scaffold { innerPadding ->
         val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animate))
         when (onBalanceView) {
