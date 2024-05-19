@@ -11,6 +11,7 @@ import com.jvmartinez.finanzapp.ui.credential.ScreenSignUp
 import com.jvmartinez.finanzapp.ui.detail.ScreenDetailTransaction
 import com.jvmartinez.finanzapp.ui.home.ScreenHome
 import com.jvmartinez.finanzapp.ui.income.TabScreen
+import com.jvmartinez.finanzapp.ui.resetPassword.ScreenResetPassword
 import com.jvmartinez.finanzapp.ui.splash.ScreenSplash
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -56,7 +57,10 @@ fun NavGraph(
                 },
                 navigateToHome = {
                     navController.navigate(RouterScreen.LoginToHomeScreen.route)
-                })
+                }, navigateToResetPassword = {
+                    navController.navigate(RouterScreen.ResetScreen.route)
+                }
+            )
         }
         composable(
             route = RouterScreen.LoginToSignUpScreen.route
@@ -87,7 +91,9 @@ fun NavGraph(
             route = RouterScreen.HomeToIncomeAndExpensesScreen.route
         ) {
             TabScreen(
-                navigationBack = { navController.popBackStack() },
+                navigationBack = {
+                    navController.navigate( RouterScreen.LoginToHomeScreen.route)
+                },
             )
         }
         composable(
@@ -106,7 +112,17 @@ fun NavGraph(
                 },
                 navigateToHome = {
                     navController.navigate(RouterScreen.LoginToHomeScreen.route)
+                },
+                navigateToResetPassword = {
+                    navController.navigate(RouterScreen.ResetScreen.route)
                 }
+            )
+        }
+        composable(
+            route = RouterScreen.ResetScreen.route
+        ) {
+            ScreenResetPassword(
+                navigationBack = { navController.popBackStack() },
             )
         }
     }

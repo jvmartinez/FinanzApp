@@ -62,4 +62,8 @@
     <string name="copy_field_date_end">to</string>
     <string name="copy_title_empty">No Data</string>
     <string name="copy_sign_out">Sign Out</string>
+    <string name="copy_reset_password">Forgot Password?</string>
+    <string name="copy_sub_title_reset_pasword">Don\'t worry! This happens. Please enter the email address associated with your account.</string>
+    <string name="copy_message_dialog_reset_password">We have sent you an email with instructions to reset your password.</string>
+    <string name="copy_message_dialog_reset_password_error">We couldn’t send the email to reset your password. Please try again.</string>
 </resources>
