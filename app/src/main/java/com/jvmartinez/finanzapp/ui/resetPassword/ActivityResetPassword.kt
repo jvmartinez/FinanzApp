@@ -17,10 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.jvmartinez.finanzapp.R
+import com.devsapiens.finanzapp.R
 import com.jvmartinez.finanzapp.component.button.ButtonBlackWithLetterWhite
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
@@ -38,17 +39,15 @@ fun ScreenResetPassword(
     navigationBack: () -> Boolean = { false }
 ) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animate))
-    val email by viewModel.onEmail().observeAsState(initial = "")
-    val toggled by viewModel.onToggleButton().observeAsState(initial = false)
-    val response by viewModel.onResponse().observeAsState(initial = StatusData.Empty)
+    val state by viewModel.onStateIU().collectAsStateWithLifecycle()
     Scaffold {
-        when (response) {
+        when (state.loadingData) {
             StatusData.Empty -> {
                 ContentResetPassword(
                     it,
                     navigationBack,
-                    email,
-                    toggled,
+                    state.email,
+                    state.toggleButton,
                     { valueEmail ->
                         viewModel.changeInput(valueEmail)
                     },
@@ -61,13 +60,19 @@ fun ScreenResetPassword(
             is StatusData.Error -> {
                 CustomDialogBase(
                     showDialog = true,
-                    onDismissClick = { viewModel.onDismissDialog() },
+                    onDismissClick = {
+                        viewModel.updateState(
+                            loadingData = StatusData.Empty
+                        )
+                    },
                     content = {
                         DialogWithOneAction(
                             R.string.copy_reset_password,
                             R.string.copy_message_dialog_reset_password_error,
                         ) {
-                            viewModel.onDismissDialog()
+                            viewModel.updateState(
+                                loadingData = StatusData.Empty
+                            )
                         }
                     }
                 )
@@ -82,10 +87,14 @@ fun ScreenResetPassword(
             }
 
             is StatusData.Success -> {
-                val status = (response as StatusData.Success).data
+                val status = (state.loadingData as StatusData.Success).data
                 CustomDialogBase(
                     showDialog = true,
-                    onDismissClick = { viewModel.onDismissDialog() },
+                    onDismissClick = {
+                        viewModel.updateState(
+                            loadingData = StatusData.Empty
+                        )
+                    },
                     content = {
                         DialogWithOneAction(
                             R.string.copy_reset_password,
@@ -95,7 +104,9 @@ fun ScreenResetPassword(
                                 R.string.copy_message_dialog_reset_password_error
                             },
                         ) {
-                            viewModel.onDismissDialog()
+                            viewModel.updateState(
+                                loadingData = StatusData.Empty
+                            )
                             if (status) {
                                 navigationBack()
                             }

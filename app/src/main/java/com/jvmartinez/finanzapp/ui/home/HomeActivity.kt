@@ -37,12 +37,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.jvmartinez.finanzapp.R
+import com.devsapiens.finanzapp.R
 import com.jvmartinez.finanzapp.component.button.BottomSheetCountries
-import com.jvmartinez.finanzapp.component.button.ButtonBlackWithLetterWhite
 import com.jvmartinez.finanzapp.component.button.ButtonTransparentBasic
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
@@ -65,7 +65,7 @@ fun ScreenHome(
     navigateToLogin: () -> Unit
 ) {
     val viewModel: HomeViewModel = hiltViewModel()
-    val onBalanceView by viewModel.onLoadingData().observeAsState(initial = StatusData.Empty)
+    val onBalanceView by viewModel.onLoadingData().collectAsStateWithLifecycle()
     var showSheet by remember { mutableStateOf(false) }
     val currentCountry by viewModel.getCurrencyKey().observeAsState()
     if (onBalanceView is StatusData.Empty) {

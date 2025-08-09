@@ -1,16 +1,18 @@
 package com.jvmartinez.finanzapp.ui.credential
 
 import android.util.Patterns
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jvmartinez.finanzapp.core.model.UserModel
 import com.jvmartinez.finanzapp.core.repository.local.perferences.IPreferencesRepository
 import com.jvmartinez.finanzapp.core.repository.remote.login.ILoginRepository
 import com.jvmartinez.finanzapp.ui.base.StatusData
+import com.jvmartinez.finanzapp.ui.credential.state.LoginUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,121 +26,142 @@ class CredentialViewModel @Inject constructor(
     private val preferencesRepository: IPreferencesRepository
 ) : ViewModel() {
 
-    private val name = MutableLiveData("")
+    private val loginState = MutableStateFlow<LoginUIState>(LoginUIState())
 
-    private val email = MutableLiveData("")
-
-    private val password = MutableLiveData("")
-
-    private val toggleButton = MutableLiveData(false)
-
-    private val loadingData = MutableLiveData<StatusData<Boolean>>(StatusData.Empty)
-
-    private val isValidPassword = MutableLiveData(true)
-
-    private val isValidEmail = MutableLiveData(true)
-
-    private val isValidName = MutableLiveData(true)
-
+    fun updateState(
+        name: String? = null,
+        email: String? = null,
+        password: String? = null,
+        toggleButton: Boolean? = null,
+        loadingData: StatusData<Boolean>? = null,
+        isValidPassword: Boolean? = null,
+        isValidEmail: Boolean? = null,
+        isValidName: Boolean? = null
+    ) {
+        loginState.update {
+            it.copy(
+                name = name ?: it.name,
+                email = email ?: it.email,
+                password = password ?: it.password,
+                toggleButton = toggleButton ?: it.toggleButton,
+                loadingData = loadingData ?: it.loadingData,
+                isValidPassword = isValidPassword ?: it.isValidPassword,
+                isValidEmail = isValidEmail ?: it.isValidEmail,
+                isValidName = isValidName ?: it.isValidName
+            )
+        }
+    }
     fun onChanceTextFieldLogin(email: String, password: String) {
-        this.email.value = email
-        this.password.value = password
-        isValidEmail.value = isValidEmail()
+       updateState(
+           email = email,
+           password = password,
+           isValidEmail = isValidEmail() && isValidPassword()
+       )
         if (password.length > 1) {
-            isValidPassword.value = isValidPassword() && this.password.value.orEmpty().length > 1
+            updateState(
+                isValidPassword = isValidPassword() && loginState.value.password.length > 1
+            )
         }
         validToggleButton()
     }
 
     fun onChanceTextFieldSignUp(name: String, email: String, password: String) {
-        this.name.value = name
-        this.email.value = email
-        this.password.value = password
-        isValidEmail.value = isValidEmail()
-        isValidName.value = isValidName()
+        updateState(
+            name = name,
+            email = email,
+            password = password,
+            isValidEmail = isValidEmail(),
+            isValidName = isValidName()
+        )
         if (password.length > 1) {
-            isValidPassword.value = isValidPassword() && this.password.value.orEmpty().length > 1
+            updateState(
+                isValidPassword = isValidPassword() && loginState.value.password.length > 1
+            )
         }
         validToggleButtonSignUp()
     }
 
     private fun validToggleButton() {
-        toggleButton.value = isValidEmail() && isValidPassword()
+        updateState(
+            toggleButton = isValidEmail() && isValidPassword()
+        )
     }
 
     private fun validToggleButtonSignUp() {
-        toggleButton.postValue(isValidEmail() && isValidPassword() && isValidName())
+        updateState(
+            toggleButton = isValidEmail() && isValidPassword() && isValidName()
+        )
     }
 
     private fun isValidName(): Boolean =
-        (name.value.orEmpty().length) > ZERO_LENGTH
+        (loginState.value.name.length) > ZERO_LENGTH
 
     private fun isValidEmail(): Boolean =
-        Patterns.EMAIL_ADDRESS.matcher(email.value.orEmpty()).matches()
+        Patterns.EMAIL_ADDRESS.matcher(loginState.value.email).matches()
 
     private fun isValidPassword(): Boolean {
         val regexPattern =
             "(?=.*[!@#\$%^&*(),.?\":{}|<>])[A-Z][a-zA-Z0-9!@#\$%^&*(),.?\":{}|<>]{5,}".toRegex()
-        return password.value.orEmpty().matches(regexPattern)
+        return loginState.value.password.matches(regexPattern)
     }
 
     fun onLogin() {
         viewModelScope.launch {
-            loadingData.value = StatusData.Loading
-            repository.signIn(email.value.orEmpty(), password.value.orEmpty()).catch {
-                loadingData.value = StatusData.Error(it.message.orEmpty())
+            updateState(
+                loadingData = StatusData.Loading
+            )
+            repository.signIn(loginState.value.email, loginState.value.password).catch {
+                updateState(
+                    loadingData = StatusData.Error(it.message.orEmpty())
+                )
             }.collect {
                 preferencesRepository.setUserKey(it.data.id.orEmpty())
                 preferencesRepository.setUserToken(it.data.token.orEmpty())
                 preferencesRepository.setUserName(it.data.name.orEmpty())
                 preferencesRepository.setSymbolKey("$")
                 preferencesRepository.setCurrencyKey("USD")
-                loadingData.value = StatusData.Success(it.code == OK_CODE)
+                updateState(
+                    loadingData = StatusData.Success(it.code == OK_CODE)
+                )
             }
         }
     }
 
     fun onSignUp() {
         viewModelScope.launch {
-            loadingData.value = StatusData.Loading
+            updateState(
+                loadingData = StatusData.Loading
+            )
             repository.signUp(
-                UserModel(name.value.orEmpty(), email.value.orEmpty(), password.value.orEmpty())
+                UserModel(loginState.value.name, loginState.value.email, loginState.value.password.orEmpty())
             ).catch {
-                loadingData.value = StatusData.Error(it.message.orEmpty())
+                updateState(
+                    loadingData = StatusData.Error(it.message.orEmpty())
+                )
             }.collect {
                 preferencesRepository.setUserKey(it.data.id.orEmpty())
                 preferencesRepository.setUserName(it.data.name.orEmpty())
                 preferencesRepository.setUserToken(it.data.token.orEmpty())
                 preferencesRepository.setSymbolKey("$")
                 preferencesRepository.setCurrencyKey("USD")
-                loadingData.value = StatusData.Success(it.code == OK_CODE)
+                updateState(
+                    loadingData = StatusData.Success(it.code == OK_CODE)
+                )
             }
         }
     }
 
 
     fun onClearField() {
-        email.value = ""
-        password.value = ""
-        name.value = ""
+        loginState.value = LoginUIState()
     }
 
-    fun onToggleButton(): LiveData<Boolean> = toggleButton
-
-    fun onEmail(): LiveData<String> = email
-
-    fun onPassword(): LiveData<String> = password
-
-    fun onName(): LiveData<String> = name
-
-    fun onLoadingData(): LiveData<StatusData<Boolean>> = loadingData
 
     fun onDismissDialog() {
-        loadingData.value = StatusData.Empty
+        updateState(
+            loadingData = StatusData.Empty
+        )
     }
 
-    fun onValidPassword(): LiveData<Boolean> = isValidPassword
-    fun onValidEmail(): LiveData<Boolean> = isValidEmail
-
-    fun onValidName(): LiveData<Boolean> = isValidName
+    fun onLoginUIState(): StateFlow<LoginUIState> = loginState
 }

@@ -18,7 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.jvmartinez.finanzapp.R
+import com.devsapiens.finanzapp.R
 import com.jvmartinez.finanzapp.component.text.TextCustom
 
 @RequiresApi(Build.VERSION_CODES.O)

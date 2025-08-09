@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.jvmartinez.finanzapp.R
+import com.devsapiens.finanzapp.R
 import com.jvmartinez.finanzapp.component.button.ButtonTransparentBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
 import com.jvmartinez.finanzapp.ui.theme.Margins

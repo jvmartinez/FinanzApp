@@ -1,5 +1,6 @@
 package com.jvmartinez.finanzapp.ui.detail
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.jvmartinez.finanzapp.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.devsapiens.finanzapp.R
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.textField.TextFieldBasic
 import com.jvmartinez.finanzapp.ui.base.ItemDatePicker
@@ -32,6 +34,7 @@ import com.jvmartinez.finanzapp.ui.home.items.ItemTransactionEmpty
 import com.jvmartinez.finanzapp.ui.theme.Margins
 import java.util.Calendar
 
+@SuppressLint("NewApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenDetailTransaction(
@@ -39,9 +42,9 @@ fun ScreenDetailTransaction(
     navigationBack: () -> Boolean = { false }
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    val transactions by viewModel.onTransaction().observeAsState(initial = mutableListOf())
-    val dateStart by viewModel.onDateStart().observeAsState("")
-    val dateEnd by viewModel.onDateEnd().observeAsState("")
+    val transactions by viewModel.onTransaction().collectAsStateWithLifecycle()
+    val dateStart by viewModel.onDateStart().collectAsStateWithLifecycle()
+    val dateEnd by viewModel.onDateEnd().collectAsStateWithLifecycle()
     val state = rememberDateRangePickerState(
         initialSelectedStartDateMillis = Calendar.getInstance().timeInMillis,
         initialSelectedEndDateMillis = Calendar.getInstance().timeInMillis,

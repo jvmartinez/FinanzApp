@@ -8,14 +8,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.jvmartinez.finanzapp.R
+import com.devsapiens.finanzapp.R
 import com.jvmartinez.finanzapp.ui.base.StatusData
 
 @Preview
@@ -27,8 +27,7 @@ fun ScreenSplash(
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_lottie))
-        val isLoaded: StatusData<Boolean> by viewModel.onStatusData()
-            .observeAsState(initial = StatusData.Loading)
+        val isLoaded: StatusData<Boolean> by viewModel.onStatusData().collectAsStateWithLifecycle()
         Column(
             modifier = Modifier
                 .padding(innerPadding)

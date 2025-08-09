@@ -13,17 +13,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.jvmartinez.finanzapp.R
+import com.devsapiens.finanzapp.R
 import com.jvmartinez.finanzapp.component.button.ButtonBlackWithLetterWhite
 import com.jvmartinez.finanzapp.component.button.ButtonTransparentBasic
 import com.jvmartinez.finanzapp.component.image.ImageBasic
@@ -33,6 +33,7 @@ import com.jvmartinez.finanzapp.ui.base.CustomDialogBase
 import com.jvmartinez.finanzapp.ui.base.DialogWithOneAction
 import com.jvmartinez.finanzapp.ui.base.DialogWithoutAction
 import com.jvmartinez.finanzapp.ui.base.StatusData
+import com.jvmartinez.finanzapp.ui.credential.state.LoginUIState
 import com.jvmartinez.finanzapp.ui.theme.AccentBlue
 import com.jvmartinez.finanzapp.ui.theme.GrayLight
 import com.jvmartinez.finanzapp.ui.theme.Margins
@@ -45,19 +46,17 @@ fun ScreenLogin(
     viewModel: CredentialViewModel = hiltViewModel(),
     navigateToResetPassword: () -> Unit,
 ) {
-    val onLoading by viewModel.onLoadingData().observeAsState(initial = StatusData.Empty)
+    val loginState by viewModel.onLoginUIState().collectAsStateWithLifecycle()
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animate))
-    val onValidPassword: Boolean by viewModel.onValidPassword().observeAsState(initial = false)
-    val onValidEmail: Boolean by viewModel.onValidEmail().observeAsState(initial = false)
 
     Column {
-        if (onValidPassword.not()) {
+        if (loginState.isValidPassword.not()) {
             DialogWithoutAction(
                 R.string.copy_message_alert_password,
                 colorBackground = GrayLight,
             )
         }
-        if (onValidEmail.not()) {
+        if (loginState.isValidEmail.not()) {
             DialogWithoutAction(
                 R.string.copy_message_alert_email,
                 colorBackground = GrayLight,
@@ -65,9 +64,15 @@ fun ScreenLogin(
             )
         }
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            when (onLoading) {
+            when (loginState.loadingData) {
                 StatusData.Empty -> {
-                    ContentLogin(innerPadding, navigateToSignUp, navigateToResetPassword, viewModel)
+                    ContentLogin(
+                        innerPadding,
+                        navigateToSignUp,
+                        navigateToResetPassword,
+                        viewModel,
+                        loginState
+                    )
                 }
 
                 is StatusData.Error -> CustomDialogBase(
@@ -100,11 +105,9 @@ fun ContentLogin(
     innerPadding: PaddingValues,
     navigateToSignUp: () -> Unit,
     navigateToResetPassword: () -> Unit,
-    viewModel: CredentialViewModel
+    viewModel: CredentialViewModel,
+    loginState: LoginUIState
 ) {
-    val email: String by viewModel.onEmail().observeAsState(initial = "")
-    val password: String by viewModel.onPassword().observeAsState(initial = "")
-    val toggleButton: Boolean by viewModel.onToggleButton().observeAsState(initial = false)
     LazyColumn(modifier = Modifier.padding(innerPadding)) {
         item {
             ItemLogo()
@@ -113,15 +116,15 @@ fun ContentLogin(
             ItemTitle()
         }
         item {
-            ItemTextFieldEmailLogin(email = email) {
+            ItemTextFieldEmailLogin(email =loginState.email) {
                 viewModel.onChanceTextFieldLogin(
                     it,
-                    password
+                    loginState.password
                 )
             }
-            ItemTextFieldPasswordLogin(password = password) {
+            ItemTextFieldPasswordLogin(password = loginState.password) {
                 viewModel.onChanceTextFieldLogin(
-                    email,
+                    loginState.email,
                     it
                 )
             }
@@ -130,7 +133,7 @@ fun ContentLogin(
             ItemForgotPassword(navigateToResetPassword)
         }
         item {
-            ItemButtonLogin(toggleButton) { viewModel.onLogin() }
+            ItemButtonLogin(loginState.toggleButton) { viewModel.onLogin() }
         }
         item {
             ItemSpacerOr()

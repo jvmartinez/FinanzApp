@@ -8,6 +8,8 @@ import com.jvmartinez.finanzapp.core.repository.local.perferences.PreferencesRep
 import com.jvmartinez.finanzapp.ui.base.StatusData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,7 +20,7 @@ class SplashViewModel @Inject constructor(
     private val repository: PreferencesRepository
 ): ViewModel() {
 
-    private val statusData = MutableLiveData<StatusData<Boolean>>()
+    private val statusData = MutableStateFlow<StatusData<Boolean>>(StatusData.Empty)
 
     init {
         viewModelScope.launch {
@@ -29,5 +31,5 @@ class SplashViewModel @Inject constructor(
         }
     }
 
-    fun onStatusData(): LiveData<StatusData<Boolean>> = statusData
+    fun onStatusData(): StateFlow<StatusData<Boolean>> = statusData
 }

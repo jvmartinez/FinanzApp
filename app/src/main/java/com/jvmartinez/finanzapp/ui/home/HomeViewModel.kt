@@ -7,8 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.devsapiens.finanzapp.R
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.jvmartinez.finanzapp.R
 import com.jvmartinez.finanzapp.core.model.Balance
 import com.jvmartinez.finanzapp.core.model.Countries
 import com.jvmartinez.finanzapp.core.model.Country
@@ -23,6 +23,8 @@ import com.jvmartinez.finanzapp.ui.model.BalanceView
 import com.jvmartinez.finanzapp.utils.Utils.getFirstLastDayOfMonth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.zip
@@ -36,7 +38,7 @@ class HomeViewModel @Inject constructor(
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
 
-    private val loadingData = MutableLiveData<StatusData<BalanceView>>(StatusData.Empty)
+    private val loadingData = MutableStateFlow<StatusData<BalanceView>>(StatusData.Empty)
 
     private val currencyKey = MutableLiveData(Pair("USD", "$"))
 
@@ -54,7 +56,7 @@ class HomeViewModel @Inject constructor(
 
     fun getBalance() {
         viewModelScope.launch {
-            loadingData.postValue(StatusData.Loading)
+            loadingData.value = StatusData.Loading
             generateCombineSelectDB().catch {
                 processRemote()
             }.collect { (balance, transaction) ->
@@ -68,7 +70,7 @@ class HomeViewModel @Inject constructor(
 
     private suspend fun processRemote() {
         generateCombineApiResponse().catch {
-            loadingData.postValue(StatusData.Error(it.message.toString()))
+            loadingData.value = StatusData.Error(it.message.toString())
         }.collect {
             it.first.let { balance ->
                 repositoryDB.saveBalance(balance)
@@ -85,7 +87,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun updateData(balance: Balance, transaction: List<Transaction>) {
-        loadingData.postValue(
+        loadingData.value = (
             StatusData.Success(
                 balance.toBalanceView(
                     transaction.toTransactionViews(
@@ -129,7 +131,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onLoadingData(): LiveData<StatusData<BalanceView>> = loadingData
+    fun onLoadingData(): StateFlow<StatusData<BalanceView>> = loadingData
     fun onDismissDialog() {
         loadingData.value = StatusData.Empty
     }

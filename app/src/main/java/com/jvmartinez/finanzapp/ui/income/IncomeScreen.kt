@@ -27,7 +27,6 @@ import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,8 +44,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.flowlayout.FlowRow
-import com.jvmartinez.finanzapp.R
+import com.devsapiens.finanzapp.R
 import com.jvmartinez.finanzapp.component.button.ButtonBlackWithLetterWhite
 import com.jvmartinez.finanzapp.component.button.ButtonTransparentBasic
 import com.jvmartinez.finanzapp.component.image.ImageBasic
@@ -54,6 +54,7 @@ import com.jvmartinez.finanzapp.component.text.TextCustom
 import com.jvmartinez.finanzapp.component.textField.TextFieldBasic
 import com.jvmartinez.finanzapp.core.model.CategoryModel
 import com.jvmartinez.finanzapp.ui.base.ItemDatePicker
+import com.jvmartinez.finanzapp.ui.income.state.IncomeAndOutComeIUState
 import com.jvmartinez.finanzapp.ui.theme.GrayDark
 import com.jvmartinez.finanzapp.ui.theme.GrayLight
 import com.jvmartinez.finanzapp.ui.theme.Margins
@@ -68,6 +69,7 @@ fun IncomeScreen(
     viewModel: IncomeAndOutComeViewModel = hiltViewModel(),
     navigationBack: () -> Unit = { false }
 ) {
+    val iuState by viewModel.onIUState().collectAsStateWithLifecycle()
     viewModel.clear()
     Scaffold {
         Column(
@@ -75,20 +77,24 @@ fun IncomeScreen(
                 .padding(it)
                 .fillMaxWidth()
         ) {
-            FormIncomeAndOutComeScreen(viewModel)
-            Content(viewModel, navigationBack)
+            FormIncomeAndOutComeScreen(viewModel, iuState)
+            Content(viewModel, iuState, navigationBack)
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Content(viewModel: IncomeAndOutComeViewModel, navigationBack: () -> Unit) {
+fun Content(
+    viewModel: IncomeAndOutComeViewModel,
+    iuState: IncomeAndOutComeIUState,
+    navigationBack: () -> Unit
+) {
     val context = LocalContext.current
-    val categories by viewModel.getCategories().observeAsState(initial = listOf())
-    val enableButton by viewModel.onEnableButtonIncome().observeAsState(initial = false)
-    if (categories.isEmpty()) {
-        viewModel.setCategories(Utils.getListCategoryIncome(context))
+    if (iuState.listCategory.isEmpty()) {
+        viewModel.updateState(
+            listCategory = Utils.getListCategoryIncome(context)
+        )
     }
     LazyColumn(
         modifier = Modifier
@@ -98,7 +104,7 @@ fun Content(viewModel: IncomeAndOutComeViewModel, navigationBack: () -> Unit) {
         item {
             val itemSize: Dp = (LocalConfiguration.current.screenWidthDp.dp / 3)
             FlowRow {
-                categories.forEach {
+                    iuState.listCategory.forEach {
                     ItemIncomeScreen(
                         it,
                         itemSize,
@@ -115,7 +121,7 @@ fun Content(viewModel: IncomeAndOutComeViewModel, navigationBack: () -> Unit) {
                     .background(GrayDark)
             )
             ButtonBlackWithLetterWhite(
-                isEnabled = enableButton,
+                isEnabled = iuState.toggleButton,
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
@@ -144,16 +150,16 @@ fun Content(viewModel: IncomeAndOutComeViewModel, navigationBack: () -> Unit) {
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormIncomeAndOutComeScreen(viewModel: IncomeAndOutComeViewModel) {
-    val date by viewModel.onDate().observeAsState(initial = "")
-    val description by viewModel.getDescription().observeAsState(initial = "")
-    val amount by viewModel.getAmount().observeAsState(initial = "")
+fun FormIncomeAndOutComeScreen(
+    viewModel: IncomeAndOutComeViewModel,
+    iuState: IncomeAndOutComeIUState
+) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         TextFieldBasic(
-            value = description,
-            onValueChange = { viewModel.onChangeSave(it, amount) },
+            value = iuState.description,
+            onValueChange = { viewModel.onChangeSave(it, iuState.amount) },
             label = stringResource(id = R.string.description),
             placeholder = stringResource(id = R.string.description),
             modifier = Modifier
@@ -163,8 +169,8 @@ fun FormIncomeAndOutComeScreen(viewModel: IncomeAndOutComeViewModel) {
         )
 
         TextFieldBasic(
-            value = amount,
-            onValueChange = { viewModel.onChangeSave(description, it) },
+            value = iuState.amount,
+            onValueChange = { viewModel.onChangeSave(iuState.description, it) },
             label = stringResource(id = R.string.amount),
             placeholder = stringResource(id = R.string.amount),
             modifier = Modifier
@@ -204,8 +210,8 @@ fun FormIncomeAndOutComeScreen(viewModel: IncomeAndOutComeViewModel) {
         }
         Row {
             TextFieldBasic(
-                value = date,
-                onValueChange = { viewModel.onChangeSave(description, amount) },
+                value = iuState.date,
+                onValueChange = { viewModel.onChangeSave(iuState.description, iuState.amount) },
                 label = stringResource(id = R.string.copy_field_date),
                 placeholder = stringResource(id = R.string.copy_field_date),
                 modifier = Modifier
