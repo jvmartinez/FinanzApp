@@ -9,14 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,10 +21,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.jvmartinez.finanzapp.R
+import com.devsapiens.finanzapp.R
 import com.jvmartinez.finanzapp.component.button.ButtonBlackWithLetterWhite
 import com.jvmartinez.finanzapp.component.image.ImageBasic
 import com.jvmartinez.finanzapp.component.text.TextCustom
@@ -38,8 +34,8 @@ import com.jvmartinez.finanzapp.ui.base.CustomDialogBase
 import com.jvmartinez.finanzapp.ui.base.DialogWithOneAction
 import com.jvmartinez.finanzapp.ui.base.DialogWithoutAction
 import com.jvmartinez.finanzapp.ui.base.StatusData
-import com.jvmartinez.finanzapp.ui.base.ViewToolbar
 import com.jvmartinez.finanzapp.ui.base.WebView
+import com.jvmartinez.finanzapp.ui.credential.state.LoginUIState
 import com.jvmartinez.finanzapp.ui.theme.AccentBlue
 import com.jvmartinez.finanzapp.ui.theme.GrayLight
 import com.jvmartinez.finanzapp.ui.theme.Margins
@@ -52,13 +48,13 @@ fun ScreenSignUp(
     viewModel: CredentialViewModel = hiltViewModel(),
 ) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animate))
-    val onLoading by viewModel.onLoadingData().observeAsState(initial = StatusData.Empty)
+    val stateIU by viewModel.onLoginUIState().collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
-        when (onLoading) {
-            StatusData.Empty -> ContentSignUp(innerPadding, viewModel, navigationBack)
+        when (stateIU.loadingData) {
+            StatusData.Empty -> ContentSignUp(innerPadding, viewModel, navigationBack, stateIU)
 
             is StatusData.Error -> {
                 CustomDialogBase(
@@ -90,15 +86,9 @@ fun ScreenSignUp(
 fun ContentSignUp(
     innerPadding: PaddingValues,
     viewModel: CredentialViewModel,
-    navigationBack: () -> Boolean
+    navigationBack: () -> Boolean,
+    stateIU: LoginUIState
 ) {
-    val email by viewModel.onEmail().observeAsState(initial = "")
-    val password by viewModel.onPassword().observeAsState(initial = "")
-    val name by viewModel.onName().observeAsState(initial = "")
-    val toggleButton: Boolean by viewModel.onToggleButton().observeAsState(initial = false)
-    val onValidPassword: Boolean by viewModel.onValidPassword().observeAsState(initial = false)
-    val onValidEmail: Boolean by viewModel.onValidEmail().observeAsState(initial = false)
-    val onValidName: Boolean by viewModel.onValidName().observeAsState(initial = false)
     var showTermsAndCondition by remember { mutableStateOf(false) }
     val actionView: () -> Unit = {
         showTermsAndCondition = true
@@ -117,20 +107,20 @@ fun ContentSignUp(
                         navigationBack()
                     }
             )
-            if (onValidPassword.not()) {
+            if (stateIU.isValidPassword.not()) {
                 DialogWithoutAction(
                     R.string.copy_message_alert_password,
                     colorBackground = GrayLight,
                 )
             }
-            if (onValidEmail.not()) {
+            if (stateIU.isValidEmail.not()) {
                 DialogWithoutAction(
                     R.string.copy_message_alert_email,
                     colorBackground = GrayLight,
                     colorText = Color.White,
                 )
             }
-            if (onValidName.not()) {
+            if (stateIU.isValidName.not()) {
                 DialogWithoutAction(
                     R.string.copy_message_alert_name,
                     colorBackground = GrayLight,
@@ -146,29 +136,29 @@ fun ContentSignUp(
                 }
                 item {
                     ItemTextFieldName(
-                        name = name,
+                        name = stateIU.name,
                         onChangeName = {
                             viewModel.onChanceTextFieldSignUp(
                                 it,
-                                email,
-                                password
+                                stateIU.email,
+                                stateIU.password
                             )
                         })
                     ItemTextFieldEmail(
-                        email = email,
+                        email = stateIU.email,
                         onChangeEmail = {
                             viewModel.onChanceTextFieldSignUp(
-                                name,
+                                stateIU.name,
                                 it,
-                                password
+                                stateIU.password
                             )
                         })
                     ItemTextFieldPassword(
-                        password = password,
+                        password = stateIU.password,
                         onChangePassword = {
                             viewModel.onChanceTextFieldSignUp(
-                                name,
-                                email,
+                                stateIU.name,
+                                stateIU.email,
                                 it
                             )
                         })
@@ -179,7 +169,7 @@ fun ContentSignUp(
                 item {
                     ItemButtonSignUp(
                         action = { viewModel.onSignUp() },
-                        isEnabled = toggleButton
+                        isEnabled = stateIU.toggleButton
                     )
                 }
             }

@@ -6,18 +6,19 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
-    namespace = "com.jvmartinez.finanzapp"
-    compileSdk = 34
+    namespace = "com.devsapiens.finanzapp"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.jvmartinez.finanzapp"
+        applicationId = "com.devsapiens.finanzapp"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -43,19 +44,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
+
     buildFeatures {
         compose = true
         buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.13"
-    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"

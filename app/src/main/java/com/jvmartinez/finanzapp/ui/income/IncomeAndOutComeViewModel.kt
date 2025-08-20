@@ -14,7 +14,10 @@ import com.jvmartinez.finanzapp.core.model.toEntity
 import com.jvmartinez.finanzapp.core.repository.local.bd.DataBaseRepository
 import com.jvmartinez.finanzapp.core.repository.local.perferences.PreferencesRepository
 import com.jvmartinez.finanzapp.core.repository.remote.balance.RepositoryBalance
+import com.jvmartinez.finanzapp.ui.income.state.IncomeAndOutComeIUState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -32,86 +35,82 @@ class IncomeAndOutComeViewModel @Inject constructor(
     private val repositoryDB: DataBaseRepository,
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
-
-    private val date = MutableLiveData<String>()
-    private val getCategories = MutableLiveData<MutableList<CategoryModel>>()
-    private val getOutComeCategories = MutableLiveData<MutableList<CategoryModel>>()
-    private val description = MutableLiveData<String>()
-    private val amount = MutableLiveData<String>()
-    private val iconTransaction = MutableLiveData<Int>()
-    private val toggleButton = MutableLiveData(false)
-
+    private val iuState = MutableStateFlow(IncomeAndOutComeIUState())
     @RequiresApi(Build.VERSION_CODES.O)
     fun processDate(selectedDateMillis: Long?) {
         selectedDateMillis?.let { dateMillis ->
             val selectedDate =
                 Instant.ofEpochMilli(dateMillis).atZone(ZoneId.of("UTC")).toLocalDate()
-            this.date.value = selectedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+            updateState(
+                date = selectedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+            )
         } ?: {
-            this.date.value = ""
+            updateState(
+                date = ""
+            )
         }
         validToggleButton()
     }
 
+    fun updateState(
+        date: String? = null,
+        description: String? = null,
+        amount: String? = null,
+        toggleButton: Boolean? = null,
+        iconTransaction: Int? = null,
+        listCategory: List<CategoryModel>? = null,
+        listOutComeCategory: List<CategoryModel>? = null,
+    ) {
+        iuState.value = iuState.value.copy(
+            date = date ?: iuState.value.date,
+            description = description ?: iuState.value.description,
+            amount = amount ?: iuState
+                .value.amount,
+            toggleButton = toggleButton ?: iuState.value.toggleButton,
+            listCategory = listCategory ?: iuState.value.listCategory,
+            listOutComeCategory = listOutComeCategory ?: iuState.value.listOutComeCategory,
+            iconTransaction = iconTransaction ?: iuState.value.iconTransaction,
+        )
+    }
 
     fun setTpeTransaction(category: CategoryModel, type: Int) {
         if (type == 1) {
-            val updateAll = getCategories().value?.map {
+            val updateAll = iuState.value.listCategory.map {
                 if (it.id == category.id) {
                     it.copy(selected = !it.selected)
                 } else {
                     it.copy(selected = false)
                 }
             }
-            updateAll?.let {
-                setCategories(it)
-            }
+            updateState(
+                listCategory = updateAll
+            )
         } else {
-            val updateAll = getOutComeCategories().value?.map {
+            val updateAll = iuState.value.listOutComeCategory.map {
                 if (it.id == category.id) {
                     it.copy(selected = !it.selected)
                 } else {
                     it.copy(selected = false)
                 }
             }
-            updateAll?.let {
-                setOutComeCategories(it)
-            }
+            updateState(
+                listOutComeCategory = updateAll
+            )
         }
-
-        this.iconTransaction.value = category.iconDrawable
+        updateState(
+            iconTransaction = category.iconDrawable
+        )
         validToggleButton()
     }
-
-    fun onDate(): LiveData<String> = date
-
-    fun getCategories(): LiveData<MutableList<CategoryModel>> = getCategories
-
-    fun setCategories(categories: List<CategoryModel>) {
-        getCategories.value = categories.toMutableList()
-    }
-
-    fun getOutComeCategories(): LiveData<MutableList<CategoryModel>> = getOutComeCategories
-
-    fun setOutComeCategories(categories: List<CategoryModel>) {
-        getOutComeCategories.value = categories.toMutableList()
-    }
-
-    fun getDescription(): LiveData<String> = description
-
-    fun getAmount(): LiveData<String> = amount
-
-    private fun getTypeIcon(): LiveData<Int> = iconTransaction
-
 
     fun save(type: Int) {
         val transaction = Transaction(
             id = 0.0,
-            amount = getAmount().value?.toDouble() ?: 0.0,
-            date = onDate().value.orEmpty(),
-            description = getDescription().value.orEmpty(),
+            amount = iuState.value.amount.toDouble(),
+            date = iuState.value.date,
+            description = iuState.value.description,
             type = type,
-            typeIcon = getTypeIcon().value ?: 0,
+            typeIcon = iuState.value.iconTransaction,
         )
         lateinit var balance: Balance
         viewModelScope.launch {
@@ -152,39 +151,40 @@ class IncomeAndOutComeViewModel @Inject constructor(
     }
 
     fun clear() {
-        this.description.value = ""
-        this.amount.value = ""
-        this.date.value = ""
-        this.iconTransaction.value = 0
+        iuState.value = IncomeAndOutComeIUState()
         validToggleButton()
     }
 
     fun onChangeSave(description: String, amount: String) {
-        this.description.value = description
-        this.amount.value = amount
+        updateState(
+            description = description,
+            amount = amount
+        )
         validToggleButton()
     }
 
     private fun validToggleButton() {
-        toggleButton.value = (isValidDescription() &&
-                isValidAmount() &&
-                isValidDate()
-                && getTypeIcon().value != 0
-                )
+        updateState(
+            toggleButton = (isValidDescription() &&
+                    isValidAmount() &&
+                    isValidDate()
+                    && iuState.value.iconTransaction != 0
+                    )
+
+        )
     }
 
     private fun isValidDescription(): Boolean {
-        return getDescription().value.orEmpty().isNotEmpty()
+        return iuState.value.description.isNotEmpty()
     }
 
     private fun isValidAmount(): Boolean {
-        return getAmount().value.orEmpty().isNotEmpty()
+        return iuState.value.amount.isNotEmpty()
     }
 
     private fun isValidDate(): Boolean {
-        return onDate().value.orEmpty().isNotEmpty()
+        return iuState.value.date.isNotEmpty()
     }
 
-    fun onEnableButtonIncome(): LiveData<Boolean> = toggleButton
-
+    fun onIUState(): StateFlow<IncomeAndOutComeIUState> = iuState
 }

@@ -1,6 +1,6 @@
 package com.jvmartinez.finanzapp.core.di
 
-import com.jvmartinez.finanzapp.BuildConfig
+import com.devsapiens.finanzapp.BuildConfig
 import com.jvmartinez.finanzapp.core.api.AuthInterceptor
 import com.jvmartinez.finanzapp.core.repository.local.perferences.PreferencesRepository
 import com.jvmartinez.finanzapp.core.repository.remote.balance.BalanceService

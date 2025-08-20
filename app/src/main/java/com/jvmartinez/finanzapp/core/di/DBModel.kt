@@ -14,14 +14,13 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DBModel {
 
-
     @Provides
     @Singleton
     fun provide(@ApplicationContext context: Context) = Room.databaseBuilder(
         context,
         AppDatabase::class.java, "database-finanz-app"
     ).allowMainThreadQueries()
-        .fallbackToDestructiveMigration()
+        .fallbackToDestructiveMigration(false)
         .addMigrations()
         .build()
 

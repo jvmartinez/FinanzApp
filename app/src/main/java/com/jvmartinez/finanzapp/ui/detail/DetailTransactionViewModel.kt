@@ -13,6 +13,8 @@ import com.jvmartinez.finanzapp.core.repository.remote.balance.RepositoryBalance
 import com.jvmartinez.finanzapp.ui.model.TransactionView
 import com.jvmartinez.finanzapp.utils.Utils.getFormattedDate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,9 +25,9 @@ class DetailTransactionViewModel @Inject constructor(
     private val preferencesRepository: PreferencesRepository
 ): ViewModel() {
 
-    private val transactions = MutableLiveData<List<TransactionView>>()
-    private val dateStart = MutableLiveData<String>()
-    private val dateEnd = MutableLiveData<String>()
+    private val transactions = MutableStateFlow<List<TransactionView>>(listOf())
+    private val dateStart = MutableStateFlow<String>("")
+    private val dateEnd = MutableStateFlow<String>("")
 
     fun findTransactions() {
         viewModelScope.launch {
@@ -40,10 +42,10 @@ class DetailTransactionViewModel @Inject constructor(
     }
 
     private fun setTransactions(transactions: List<Transaction>, symbol: String = "$") {
-        this.transactions.postValue(transactions.toTransactionViews(symbol))
+        this.transactions.value = transactions.toTransactionViews(symbol)
     }
 
-    fun onTransaction(): LiveData<List<TransactionView>> = transactions
+    fun onTransaction(): StateFlow<List<TransactionView>> = transactions
 
     fun setDateStart(date: Long) {
         dateStart.value = getFormattedDate(date)
@@ -53,7 +55,7 @@ class DetailTransactionViewModel @Inject constructor(
         dateEnd.value = getFormattedDate(date)
     }
 
-    fun onDateStart(): LiveData<String> = dateStart
+    fun onDateStart(): StateFlow<String> = dateStart
 
-    fun onDateEnd(): LiveData<String> = dateEnd
+    fun onDateEnd(): StateFlow<String> = dateEnd
 }
